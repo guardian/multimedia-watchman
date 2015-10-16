@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ffqueue>
+	<global>
+		<debuglevel>2</debuglevel>
+		<slots>12</slots>
+	</global>
+	<path location="/Downloads/dev-stuff/ffqueue/watchfolder with spaces">
+		<debuglevel>5</debuglevel>
+		<desc>Test watchfolder with spaces</desc>
+		<poll-time>5</poll-time>	<!--check this number of seconds -->
+		<stable-iterations>2</stable-iterations> <!--trigger a file if it's been there for this long -->
+		<!--you should NOT use relative paths here.... paths are relative to where the daemon was started from, so you don't know...-->
+		<command>mv {filepath} complete/;sleep 20s</command>
+	</path>	
+<!--
+	<path location="/Downloads/dev-stuff/ffqueue/wf1">
+		<debuglevel>5</debuglevel>
+		<desc>Test watchfolder 1</desc>
+		<poll-time>10</poll-time>	
+		<stable-iterations>2</stable-iterations>
+		<suffices>_64k|_128k|_512k</suffices>
+		<command>mv {filepath} complete/;sleep 20s</command>
+	</path>
+-->
+	<path location="/Downloads/dev-stuff/ffqueue/wf2">
+		<desc>Test watchfolder 2</desc>
+		<poll-time>10</poll-time>	<!--check this number of seconds -->
+		<stable-iterations>2</stable-iterations> <!--trigger a file if it's been there for this long -->
+		<command>mv {filepath} complete/</command>
+	</path>
+
+</ffqueue>
