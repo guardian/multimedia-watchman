@@ -20,3 +20,4 @@ notifier = pyinotify.Notifier(wm, handler)
 wdd = wm.add_watch('/mnt/mac/tdtw', mask, rec=True)
 
 notifier.loop()
+fhgfgh
