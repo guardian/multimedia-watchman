@@ -4,6 +4,7 @@ import threading
 import time
 from time import sleep, time
 from pprint import pprint, pformat
+import os.path
 
 class WatchDogBasedSystem(threading.Thread):
     import sys
@@ -47,7 +48,7 @@ class WatchDogBasedSystem(threading.Thread):
 
                     if ts < (timeint2 - 10):
                         print "{0} is More than ten seconds old".format(path)
-                        action_file.delay(filepath=path)
+                        action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
                         #del self.wonderfullist[index]
                         del self.wonderfullist[path]
 
