@@ -23,4 +23,6 @@ def xsum(numbers):
 
 @app.task
 def action_file(filepath="", filename=""):
+    from time import sleep
     logger.info("Got {0} {1}".format(filepath, filename))
+    sleep(5)
