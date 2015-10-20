@@ -4,8 +4,11 @@ import xml.etree.ElementTree as ET
 from sys import argv
 from pprint import pprint
 from watchpuppy import WatchDogBasedSystem
+import signal, os
+import threading
+import time
 
-
+folders = {}
 
 class WatchedFolder(object):
     def __init__(self,record=None,location=None,debuglevel=None,polltime=None,stable_iterations=None,command=None):
@@ -15,6 +18,7 @@ class WatchedFolder(object):
         self.stable_iterations=stable_iterations
         self.command=command
         self.description=""
+        self.kennel = None
 
         if record is not None:
             self.location=record.attrib['location']
@@ -26,7 +30,6 @@ class WatchedFolder(object):
 
     def __unicode__(self):
         return u'Watched folder at {0} running \'{1}\': {2}'.format(self.location,self.command,self.description)
-        WatchDogBasedSystem(location='/tmp')
 
     def _safe_get(self, record, xpath):
         try:
@@ -35,6 +38,8 @@ class WatchedFolder(object):
             return "(not found)"
 
 
+#START MAIN
+#signal.signal(signal.SIGINT, interrupt_handler)
 tree = ET.parse('ffqueue-config.xml')
 
 root = tree.getroot()
@@ -43,13 +48,19 @@ root = tree.getroot()
 
 #print root[0][1].text
 
-folders = {}
+
 for record in tree.findall("path"):
     f=WatchedFolder(record=record)
     #folders.append(f)
     folders[f.location] = f
     print f.__unicode__()
+    s = WatchDogBasedSystem(location=f.location)
+    s.daemon = True
+    folders[f.location].kennel = s
+    s.start()
     #pprint(f)
     #pprint(f.__dict__)
 
+while True:
+    time.sleep(3600)
 #pprint(folders)

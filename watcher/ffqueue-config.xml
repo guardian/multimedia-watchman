@@ -4,7 +4,7 @@
 		<debuglevel>2</debuglevel>
 		<slots>12</slots>
 	</global>
-	<path location="/Downloads/dev-stuff/ffqueue/watchfolder with spaces">
+	<path location="/tmp">
 		<debuglevel>5</debuglevel>
 		<desc>Test watchfolder with spaces</desc>
 		<poll-time>5</poll-time>	<!--check this number of seconds -->
@@ -22,7 +22,7 @@
 		<command>mv {filepath} complete/;sleep 20s</command>
 	</path>
 -->
-	<path location="/Downloads/dev-stuff/ffqueue/wf2">
+	<path location="/home">
 		<desc>Test watchfolder 2</desc>
 		<poll-time>10</poll-time>	<!--check this number of seconds -->
 		<stable-iterations>2</stable-iterations> <!--trigger a file if it's been there for this long -->
