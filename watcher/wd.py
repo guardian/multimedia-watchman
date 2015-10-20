@@ -3,10 +3,12 @@ __author__ = 'david_allison'
 import sys
 import time
 import logging
-from watchdog.observers.polling import PollingObserver
+import os
+from watchdog.observers.polling import PollingObserver,PollingObserverVFS
 from watchdog.events import LoggingEventHandler
 from watchdog.events import FileSystemEventHandler
 from tasks import action_file
+
 
 class MyEventHandler(FileSystemEventHandler):
     def __init__(self, observer):
@@ -30,7 +32,8 @@ if __name__ == "__main__":
         path = sys.argv[1] if len(sys.argv) > 1 else '.'
  #       event_handler = LoggingEventHandler()
 
-        observer = PollingObserver()
+#        observer = PollingObserver()
+        observer = PollingObserverVFS(os.stat, os.listdir, polling_interval=0.8)
         event_handler = MyEventHandler(observer)
         observer.schedule(event_handler, path, recursive=True)
         observer.start()
