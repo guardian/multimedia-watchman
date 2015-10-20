@@ -16,9 +16,9 @@ from tasks import action_file
 
 wonderfullist = []
 
-duebiouslist = [1,3]
+#duebiouslist = [1,3]
 
-duebiousvalue = 6
+#duebiousvalue = 6
 
 
 
@@ -88,7 +88,7 @@ class MyEventHandler(FileSystemEventHandler):
 
             print wonderfullist
 
-            action_file.delay(filepath=event.src_path)
+
 
 if __name__ == "__main__":
         path = sys.argv[1]
@@ -106,6 +106,32 @@ if __name__ == "__main__":
         observer.start()
         try:
             while True:
+                print "System running"
+                timestamp2 = time.time()
+                timeint2 = int(timestamp2)
+                print timeint2
+                for item in wonderfullist:
+                    print item
+                    if item[1] < (timeint2 - 10):
+                        print "More than ten seconds old"
+                        action_file.delay(filepath=item[0])
+                        #del wonderfullist[index]
+
+                        cm = 0
+
+                        while cm < len(wonderfullist):
+
+                            if item[0] in wonderfullist[cm]:
+                                print "List contains", item[0]
+                                found = 1
+                                del wonderfullist[cm]
+
+                            cm = cm + 1
+
+                for index, item in enumerate(wonderfullist):
+                    print index, item
+                for index in range(len(wonderfullist)):
+                    print index
                 time.sleep(1)
         except KeyboardInterrupt:
             observer.stop()
