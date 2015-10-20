@@ -26,6 +26,7 @@ def action_file(filepath="", filename=""):
     import xml.etree.cElementTree as ET
     from watchedfolder import WatchedFolder
     import os.path
+    from subprocess import call
 
     tree = ET.parse('ffqueue-config.xml')
     #root = tree.getroot()
@@ -33,4 +34,6 @@ def action_file(filepath="", filename=""):
     logger.info("config is: {0}".format(config.__dict__))
     cmd = config.command.format(pathonly=filepath, filename=filename, filepath=os.path.join(filepath, filename))
     logger.info("command to run: {0}".format(cmd))
+    call(format(cmd), shell=True)
+
     sleep(5)

@@ -10,7 +10,7 @@
 		<poll-time>5</poll-time>	<!--check this number of seconds -->
 		<stable-iterations>2</stable-iterations> <!--trigger a file if it's been there for this long -->
 		<!--you should NOT use relative paths here.... paths are relative to where the daemon was started from, so you don't know...-->
-		<command>mv {filepath} complete/;sleep 20s</command>
+		<command>mv {filepath} /tmp/complete/;sleep 20s</command>
 	</path>	
 <!--
 	<path location="/Downloads/dev-stuff/ffqueue/wf1">
@@ -26,7 +26,7 @@
 		<desc>Test watchfolder 2</desc>
 		<poll-time>10</poll-time>	<!--check this number of seconds -->
 		<stable-iterations>2</stable-iterations> <!--trigger a file if it's been there for this long -->
-		<command>mv {filepath} complete/</command>
+		<command>mv {filepath} /complete/</command>
 	</path>
 
 </ffqueue>
