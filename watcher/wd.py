@@ -4,10 +4,22 @@ import sys
 import time
 import logging
 import os
+import time
 from watchdog.observers.polling import PollingObserver,PollingObserverVFS
 from watchdog.events import LoggingEventHandler
 from watchdog.events import FileSystemEventHandler
 from tasks import action_file
+
+
+
+#wonderfullist = [[1,12376763],[2,12366253],[5,123761723]]
+
+wonderfullist = []
+
+duebiouslist = [1,3]
+
+duebiousvalue = 6
+
 
 
 
@@ -19,9 +31,63 @@ class MyEventHandler(FileSystemEventHandler):
     def on_created(self, event):
         print "e=", event
 
+        found = 0
+
+        if event.is_directory == False:
+
+            cm = 0
+
+            while cm < len(wonderfullist):
+
+                if event.src_path in wonderfullist[cm]:
+                    print "List contains", event.src_path
+                    found = 1
+                    del wonderfullist[cm]
+                    print "Adding ", event.src_path, " to list"
+                    timestamp = time.time()
+                    timeint = int(timestamp)
+                    wonderfullist.append([event.src_path,timeint])
+
+                cm = cm + 1
+
+            if found == 0 :
+                print "Adding ", event.src_path, " to list"
+                timestamp = time.time()
+                timeint = int(timestamp)
+                wonderfullist.append([event.src_path,timeint])
+
+            print wonderfullist
+
     def on_modified(self, event):
         print "e=", event
+
+        found = 0
+
         if event.is_directory == False:
+
+            cm = 0
+
+            while cm < len(wonderfullist):
+
+                if event.src_path in wonderfullist[cm]:
+                    print "List contains", event.src_path
+                    found = 1
+                    del wonderfullist[cm]
+                    print "Adding ", event.src_path, " to list"
+                    timestamp = time.time()
+                    timeint = int(timestamp)
+                    wonderfullist.append([event.src_path,timeint])
+
+                cm = cm + 1
+
+            if found == 0 :
+                print "Adding ", event.src_path, " to list"
+                timestamp = time.time()
+                timeint = int(timestamp)
+                wonderfullist.append([event.src_path,timeint])
+
+            print wonderfullist
+
             action_file.delay(filepath=event.src_path)
 
 if __name__ == "__main__":
