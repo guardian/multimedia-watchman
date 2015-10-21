@@ -6,6 +6,7 @@ from time import sleep, time
 from pprint import pprint, pformat
 import os.path
 
+
 class WatchDogBasedSystem(threading.Thread):
     import sys
     import time
@@ -16,13 +17,13 @@ class WatchDogBasedSystem(threading.Thread):
     from watchdog.events import FileSystemEventHandler
     from tasks import action_file
 
-    def __init__(self, location=None, polltime=None, *args, **kwargs):
+    def __init__(self, location=None, poll_delay=1, stable_time=10, *args, **kwargs):
         super(WatchDogBasedSystem, self).__init__(*args,**kwargs)
         import logging
         self.path=location
-        self.polltime=polltime
         self.wonderfullist = {}
-        self.poll_delay = 1
+        self.poll_delay = poll_delay
+        self.stable_time = stable_time
 
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s - %(message)s',
@@ -46,8 +47,8 @@ class WatchDogBasedSystem(threading.Thread):
                 for path, ts in self.wonderfullist.items():
                     pprint({path: ts})
 
-                    if ts < (timeint2 - 10):
-                        print "{0} is More than ten seconds old".format(path)
+                    if ts < (timeint2 - self.stable_time):
+                        print "{0} is More than {1} seconds old".format(path, self.stable_time)
                         action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
                         #del self.wonderfullist[index]
                         del self.wonderfullist[path]

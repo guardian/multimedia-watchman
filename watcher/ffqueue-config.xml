@@ -3,14 +3,16 @@
 	<global>
 		<debuglevel>2</debuglevel>
 		<slots>12</slots>
+		<raven-dsn>https://7928615ccf1f487595f47e2a07f7d5e4:37ab2ae324d0405081cf91f48a5e9c7f@sentry.multimedia.theguardian.com/13</raven-dsn>
 	</global>
+
 	<path location="/tmp">
 		<debuglevel>5</debuglevel>
 		<desc>Test watchfolder with spaces</desc>
 		<poll-time>5</poll-time>	<!--check this number of seconds -->
 		<stable-iterations>2</stable-iterations> <!--trigger a file if it's been there for this long -->
 		<!--you should NOT use relative paths here.... paths are relative to where the daemon was started from, so you don't know...-->
-		<command>mv {filepath} /tmp/complete/;sleep 20s</command>
+		<command>mv {filepath} /tmp/complete/</command>
 	</path>	
 <!--
 	<path location="/Downloads/dev-stuff/ffqueue/wf1">
