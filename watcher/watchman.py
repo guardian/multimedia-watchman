@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 __author__ = 'david_allison'
 
 import xml.etree.ElementTree as ET
