@@ -1,23 +1,27 @@
 __author__ = 'david_allison'
 
 import threading
-import time
 from time import sleep, time
-from pprint import pprint, pformat
-import os.path
+from pprint import pprint
 
 
 class WatchDogBasedSystem(threading.Thread):
-    import sys
-    import time
-    import logging
-    import os
+    """
+    This class represents the watchfolder system based on the 3rd party WatchDog system
+    """
 
-    from watchdog.events import LoggingEventHandler
     from watchdog.events import FileSystemEventHandler
-    from tasks import action_file
+
 
     def __init__(self, location=None, poll_delay=1, stable_time=10, *args, **kwargs):
+        """
+        Initialise the system
+        :param location: (string) Path to the directory to watch
+        :param poll_delay: (int) Sleep this long (in seconds) between each poll
+        :param stable_time: (int) Trigger a file when it has been stable for this many seconds
+        :param args: (other arguments for threading.Thread)
+        :param kwargs: (other arguments for threading.Thread)
+        """
         super(WatchDogBasedSystem, self).__init__(*args,**kwargs)
         import logging
         self.path=location
@@ -30,6 +34,11 @@ class WatchDogBasedSystem(threading.Thread):
                             datefmt='%Y-%m-%d %H:%M:%S')
 
     def run(self):
+        """
+        "Main loop" that polls the requested folder.
+        Don't call this method directly,  Call WatchDogBasedSystem.start() to run it in a seperate thread.
+        :return: Does not return.
+        """
         from watchdog.observers.polling import PollingObserver,PollingObserverVFS
         import os
         from tasks import action_file
@@ -50,104 +59,51 @@ class WatchDogBasedSystem(threading.Thread):
                     if ts < (timeint2 - self.stable_time):
                         print "{0} is More than {1} seconds old".format(path, self.stable_time)
                         action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
-                        #del self.wonderfullist[index]
                         del self.wonderfullist[path]
 
-                        cm = 0
 
-                        # while cm < len(self.wonderfullist):
-                        #
-                        #     if item[0] in self.wonderfullist[cm]:
-                        #         print "List contains", item[0]
-                        #         found = 1
-                        #         del self.wonderfullist[cm]
-                        #
-                        #     cm = cm + 1
-
-                # for index, item in enumerate(self.wonderfullist):
-                #     print index, item
-                # for index in range(len(self.wonderfullist)):
-                #      print index
                 sleep(self.poll_delay)
         except KeyboardInterrupt:
             observer.stop()
         observer.join()
 
     def __unicode__(self):
-        #global path
-        #path = format(self.location)
-        #print path
         return u'{0}'.format(unicode(self.path))
 
     class MyEventHandler(FileSystemEventHandler):
+        """
+        Event handler for Watchdog
+        """
         def __init__(self, observer, list=None):
             self.observer = observer
             self.wonderfullist = list
-     #       self.filename = filename
 
         def on_created(self, event):
+            """
+            Triggered when a file is created
+            """
             import time
             print "e=", event
 
-            found = 0
-
             if event.is_directory == False:
 
-                cm = 0
                 timestamp = time.time()
                 timeint = int(timestamp)
                 self.wonderfullist[event.src_path] = timeint
 
-                # while cm < len(self.wonderfullist):
-                #
-                #     if event.src_path in self.wonderfullist[cm]:
-                #         print "List contains", event.src_path
-                #         found = 1
-                #         del self.wonderfullist[cm]
-                #         print "Adding ", event.src_path, " to list"
-                #         timestamp = time.time()
-                #         timeint = int(timestamp)
-                #         #self.wonderfullist.append([event.src_path,timeint])
-                #         self.wonderfullist[event.src_path] = timeint
-                #     cm = cm + 1
-                #
-                # if found == 0 :
-                #     print "Adding ", event.src_path, " to list"
-                #     timestamp = time.time()
-                #     timeint = int(timestamp)
-                #     #self.wonderfullist.append([event.src_path,timeint])
-                #     self.wonderfullist[event.src_path] = timeint
-
                 print self.wonderfullist
 
         def on_modified(self, event):
+            """
+            Triggered when a file is modified
+            """
             print "e=", event
 
-            found = 0
-
             if event.is_directory == False:
-                cm = 0
+
                 timestamp = time()
                 timeint = int(timestamp)
-                # while cm < len(self.wonderfullist):
-                #
-                #     if event.src_path in self.wonderfullist[cm]:
-                #         print "List contains", event.src_path
-                #         found = 1
-                #         del self.wonderfullist[cm]
-                #         print "Adding ", event.src_path, " to list"
-                #         timestamp = time.time()
-                #         timeint = int(timestamp)
-                #         self.wonderfullist.append([event.src_path,timeint])
-                #
-                #     cm = cm + 1
-                #
-                # if found == 0 :
-                #     print "Adding ", event.src_path, " to list"
-                #     timestamp = time.time()
-                #     timeint = int(timestamp)
-                #     self.wonderfullist.append([event.src_path,timeint])
-                #if event.src_path in self.wonderfullist:
+
 
                 self.wonderfullist[event.src_path] = timeint
                 print self.wonderfullist

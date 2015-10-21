@@ -1,25 +1,9 @@
-#from __future__ import absolute_import
 __author__ = 'david_allison'
 
 from celery_app import app
 import logging
 
 logger = logging.getLogger('watchman.tasks')
-
-@app.task
-def add(x, y):
-    return x + y
-
-
-@app.task
-def mul(x, y):
-    return x * y
-
-
-@app.task
-def xsum(numbers):
-    return sum(numbers)
-
 
 class DSNNotFound(Exception):
     pass
@@ -41,25 +25,29 @@ def get_dsn(settingsdoc, raise_exception=False):
 
 @app.task
 def action_file(filepath="", filename=""):
-    from time import sleep
+    """
+
+    Submits the task to Celery, executes the Linux command, records information in the Celery log, and submits any errors to Sentry via Raven
+    :param filepath: Path of the file to be acted on
+    :param filename: Name of the file to be acted on
+    """
+
     import xml.etree.cElementTree as ET
     from watchedfolder import WatchedFolder
     import os.path
     from subprocess import call,check_output,CalledProcessError
     import subprocess
     from raven import Client
-#    import subprocess
-
 
     tree = ET.parse('ffqueue-config.xml')
-    #root = tree.getroot()
+
     try:
         raven_client = Client(get_dsn(tree), raise_exception=True)
     except DSNNotFound:
         logger.error("No Sentry DSN in the settings file, errors will not be logged to Sentry")
         raven_client = None
 
-    config = WatchedFolder(record=tree.find('//path[@location="{0}"]'.format(filepath)))
+    config = WatchedFolder(record=tree.find('//path[@location="{0}"]'.format(filepath)), raven_client=raven_client)
     logger.info("config is: {0}".format(config.__dict__))
 
     config.verify()
@@ -89,7 +77,3 @@ def action_file(filepath="", filename=""):
                 'watcher': config.description,
             })
             raven_client.captureException()
-
-    #e = CalledProcessError(output=output)
-
-    sleep(5)

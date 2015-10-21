@@ -8,6 +8,9 @@ import signal, os
 import threading
 import time
 from watchedfolder import WatchedFolder
+from raven import Client as RavenClient
+from tasks import get_dsn, DSNNotFound
+import logging
 
 folders = {}
 
@@ -21,13 +24,19 @@ root = tree.getroot()
 
 #print root[0][1].text
 
+try:
+    raven_client = RavenClient(get_dsn(tree), raise_exception=True)
+except DSNNotFound:
+    logging.error("No Sentry DSN in the settings file, errors will not be logged to Sentry")
+    raven_client = None
 
 for record in tree.findall("path"):
-    f=WatchedFolder(record=record)
+    f=WatchedFolder(record=record, raven_client=raven_client)
     #folders.append(f)
     folders[f.location] = f
+    pprint(f.__dict__)
     print f.__unicode__()
-    s = WatchDogBasedSystem(location=f.location)
+    s = WatchDogBasedSystem(location=f.location, stable_time=f.stable_time)
     s.daemon = True
     folders[f.location].kennel = s
     s.start()
