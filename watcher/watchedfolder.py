@@ -27,3 +27,11 @@ class WatchedFolder(object):
             return record.find(xpath).text
         except AttributeError:
             return "(not found)"
+
+    def verify(self):
+        if self.command is None:
+            raise ValueError("Invalid watchfolder: command is not set")
+        if self.location is None:
+            raise ValueError("Invalid watchfolder: location is not set")
+        if self.polltime is None:
+            raise ValueError("Invalid watchfolder: polltime is not set")

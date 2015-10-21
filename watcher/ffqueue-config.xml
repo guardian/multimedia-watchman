@@ -12,7 +12,8 @@
 		<poll-time>5</poll-time>	<!--check this number of seconds -->
 		<stable-iterations>2</stable-iterations> <!--trigger a file if it's been there for this long -->
 		<!--you should NOT use relative paths here.... paths are relative to where the daemon was started from, so you don't know...-->
-		<command>mv {filepath} /tmp/complete/</command>
+		<!--<command>mv {filepath} /tmp/complete/</command> -->
+		<command>ls</command>
 	</path>	
 <!--
 	<path location="/Downloads/dev-stuff/ffqueue/wf1">

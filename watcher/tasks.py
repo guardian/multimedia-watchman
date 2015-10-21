@@ -61,12 +61,19 @@ def action_file(filepath="", filename=""):
 
     config = WatchedFolder(record=tree.find('//path[@location="{0}"]'.format(filepath)))
     logger.info("config is: {0}".format(config.__dict__))
+
+    config.verify()
+
     cmd = config.command.format(pathonly=filepath, filename=filename, filepath=os.path.join(filepath, filename))
     logger.info("command to run: {0}".format(cmd))
 
     try:
         output = check_output(format(cmd), shell=True, stderr=subprocess.STDOUT)
-        logger.info("output: {0}".format(output))
+        if len(output)>0:
+            logger.info("output: {0}".format(unicode(output)))
+        else:
+            logger.info("command completed with no output")
+
     except CalledProcessError as e:
         logger.error("Command {cmd} failed with exit code {code}. Output was: {out}".format(
             cmd=e.cmd,
