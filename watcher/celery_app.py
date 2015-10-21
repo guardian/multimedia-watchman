@@ -1,13 +1,14 @@
 from __future__ import absolute_import
 
 from celery import Celery
+"""
+Various setting for Celery
+"""
 
 __author__ = 'david_allison'
 
 BROKER_URL = '***REMOVED***'
 CELERY_RESULT_BACKEND = '***REMOVED***'
-#BROKER_URL = 'redis://localhost:6379/0'
-#CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
 app = Celery('watcher',
              broker=BROKER_URL,
