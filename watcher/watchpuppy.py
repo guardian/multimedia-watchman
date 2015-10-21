@@ -49,10 +49,8 @@ class WatchDogBasedSystem(threading.Thread):
         observer.start()
         try:
             while True:
-                #print "System running"
                 timestamp2 = time()
                 timeint2 = int(timestamp2)
-                #print timeint2
                 for path, ts in self.wonderfullist.items():
                     pprint({path: ts})
 

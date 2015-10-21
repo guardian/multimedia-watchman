@@ -39,7 +39,7 @@ def action_file(filepath="", filename=""):
     import subprocess
     from raven import Client
 
-    tree = ET.parse('ffqueue-config.xml')
+    tree = ET.parse('/etc/ffqueue-config.xml')
 
     try:
         raven_client = Client(get_dsn(tree), raise_exception=True)
