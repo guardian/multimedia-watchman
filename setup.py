@@ -8,5 +8,6 @@ setup(name='Watchman',
       author='Andy Gallagher and David Allison',
       author_email='multimediatech@theguardian.com',
       packages=['watcher'],
-      scripts=['watcher/watchman.py']
+      scripts=['watcher/watchman.py'],
+      requires=['celery','certifi','raven','watchdog']
      )
