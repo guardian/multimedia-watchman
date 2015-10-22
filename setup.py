@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
 from shutil import copy
 import os, errno
+from setuptools import setup, find_packages
 
 def mkdir_p(path):
     try:
@@ -19,7 +19,7 @@ setup(name='Watchman',
       author_email='multimediatech@theguardian.com',
       packages=['watcher'],
       scripts=['watcher/watchman'],
-      requires=['celery', 'certifi', 'raven', 'watchdog', 'supervisor']
+      install_requires=['celery', 'certifi', 'raven', 'redis', 'watchdog']
      )
 
 print "--------------------------"
