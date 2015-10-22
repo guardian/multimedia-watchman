@@ -33,7 +33,7 @@ def action_file(filepath="", filename=""):
     """
 
     import xml.etree.cElementTree as ET
-    from watchedfolder import WatchedFolder
+    from watcher.watchedfolder import WatchedFolder
     import os.path
     from subprocess import call,check_output,CalledProcessError
     import subprocess

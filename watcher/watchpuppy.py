@@ -13,7 +13,7 @@ class WatchDogBasedSystem(threading.Thread):
     from watchdog.events import FileSystemEventHandler
 
 
-    def __init__(self, location=None, poll_delay=1, stable_time=10, *args, **kwargs):
+    def __init__(self, location=None, poll_delay=1, stable_time=10, recursive=False, *args, **kwargs):
         """
         Initialise the system
         :param location: (string) Path to the directory to watch
@@ -28,6 +28,7 @@ class WatchDogBasedSystem(threading.Thread):
         self.wonderfullist = {}
         self.poll_delay = poll_delay
         self.stable_time = stable_time
+        self.recursive = recursive
 
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s - %(message)s',
@@ -45,7 +46,7 @@ class WatchDogBasedSystem(threading.Thread):
 
         observer = PollingObserverVFS(os.stat, os.listdir, polling_interval=0.8)
         event_handler = self.MyEventHandler(observer, list=self.wonderfullist)
-        observer.schedule(event_handler, self.path, recursive=True)
+        observer.schedule(event_handler, self.path, recursive=self.recursive)
         observer.start()
         try:
             while True:

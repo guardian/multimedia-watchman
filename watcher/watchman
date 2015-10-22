@@ -3,11 +3,11 @@
 __author__ = 'david_allison'
 
 import xml.etree.ElementTree as ET
-from watchpuppy import WatchDogBasedSystem
+from watcher.watchpuppy import WatchDogBasedSystem
 import time
-from watchedfolder import WatchedFolder
+from watcher.watchedfolder import WatchedFolder
 from raven import Client as RavenClient
-from tasks import get_dsn, DSNNotFound
+from watcher.tasks import get_dsn, DSNNotFound
 import logging
 
 """
