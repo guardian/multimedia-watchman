@@ -101,8 +101,9 @@ def action_file(filepath="", filename=""):
     from subprocess import CalledProcessError
     import subprocess
     from raven import Client
+    from watcher.global_settings import CONFIG_FILE
 
-    tree = ET.parse('/etc/ffqueue-config.xml')
+    tree = ET.parse(CONFIG_FILE)
 
     try:
         raven_client = Client(get_dsn(tree), raise_exception=True)
@@ -111,13 +112,13 @@ def action_file(filepath="", filename=""):
         raven_client = None
 
    # config = WatchedFolder(record=tree.find('//path[@location="{0}"]'.format(filepath)), raven_client=raven_client)
-    config = WatchedFolder(record=get_location_config(tree,filepath), raven_client=raven_client)
+    config = WatchedFolder(record=get_location_config(tree, filepath), raven_client=raven_client)
 
     logger.info("config is: {0}".format(config.__dict__))
 
     config.verify()
 
-    cmd = config.command.format(pathonly=filepath, filename=filename, filepath=os.path.join(filepath, filename))
+    cmd = config.command.format(pathonly='"'+filepath+'"', filename='"'+filename+'"', filepath='"'+os.path.join(filepath, filename)+'"')
     logger.info("command to run: {0}".format(cmd))
 
     try:

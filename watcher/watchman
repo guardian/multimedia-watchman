@@ -9,6 +9,7 @@ from watcher.watchedfolder import WatchedFolder
 from raven import Client as RavenClient
 from watcher.tasks import get_dsn, DSNNotFound
 import logging
+from watcher.global_settings import CONFIG_FILE
 
 """
 Main Python file that should be called to execute the Watchman system.
@@ -19,7 +20,7 @@ folders = {}
 
 #START MAIN
 
-tree = ET.parse('/etc/ffqueue-config.xml')
+tree = ET.parse(CONFIG_FILE)
 root = tree.getroot()
 
 try:
