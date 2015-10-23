@@ -10,6 +10,7 @@ __author__ = 'david_allison'
 BROKER_URL = '***REMOVED***'
 CELERY_RESULT_BACKEND = '***REMOVED***'
 
+
 app = Celery('watcher',
              broker=BROKER_URL,
              backend=CELERY_RESULT_BACKEND,
@@ -18,7 +19,10 @@ app = Celery('watcher',
 # Optional configuration, see the application user guide.
 app.conf.update(
     CELERY_TASK_RESULT_EXPIRES=3600,
+    CELERY_ACCEPT_CONTENT=['json'],
+    CELERY_TASK_SERIALIZER='json'
 )
+
 
 if __name__ == '__main__':
     app.start()

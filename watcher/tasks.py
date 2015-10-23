@@ -1,9 +1,11 @@
 __author__ = 'david_allison'
 
 from celery_app import app
+
 import logging
 
 logger = logging.getLogger('watchman.tasks')
+
 
 class DSNNotFound(Exception):
     pass
@@ -23,6 +25,67 @@ def get_dsn(settingsdoc, raise_exception=False):
         else:
             return None
 
+from subprocess import CalledProcessError
+class CommandFailed(CalledProcessError):
+    """
+    Upgraded eversion of CalledProcessError to hold command outputs as well
+    """
+    def __init__(self, stdout_text, stderr_text, *args, **kwargs):
+        super(CommandFailed,self).__init__(*args,**kwargs)
+        self.stdout_text = stdout_text
+        self.stderr_text = stderr_text
+        self.output = stderr_text + stdout_text
+
+    def __unicode__(self):
+        return u'Command {cmd} failed with output code {code}.\nStandard error: {stderr}'.format(
+            cmd=self.cmd,
+            code=self.returncode,
+            stderr=self.stderr_text,
+            stdout=self.stdout_text
+        )
+
+    def __str__(self):
+        return self.__unicode__().encode('ascii')
+
+
+def run_command(cmd, concat=False):
+    """
+    Runs the specified commandline in a shell, via subprocess
+    :param cmd: Commandline to run
+    :param concat:  if True, returns concatenation of standard output and standard error. If false, return a tuple.
+    :return: See concat
+    """
+    from subprocess import Popen, PIPE
+    from shlex import split
+
+    #args = split(cmd)
+    #args = ['/bin/bash', '-l', '-c', cmd]
+    #logger.debug("run_command: split args are %s" % args)
+    proc = Popen(cmd, shell=True, stdin=None, stdout=PIPE, stderr=PIPE)
+
+    stdout_text, stderr_text = proc.communicate()
+
+    if proc.returncode != 0:
+        out_text = stderr_text + stdout_text
+        rtn = proc.returncode
+        raise CommandFailed(stdout_text, stderr_text, rtn, cmd)
+
+    if concat:
+        return stdout_text + stderr_text
+    else:
+        return (stdout_text, stderr_text)
+
+
+class LocationConfigNotFound(StandardError):
+    pass
+
+
+def get_location_config(tree, loc):
+    for node in tree.findall('//path'):
+        if node.attrib['location'] == loc:
+            return node
+    raise LocationConfigNotFound(loc)
+
 @app.task
 def action_file(filepath="", filename=""):
     """
@@ -35,7 +98,7 @@ def action_file(filepath="", filename=""):
     import xml.etree.cElementTree as ET
     from watcher.watchedfolder import WatchedFolder
     import os.path
-    from subprocess import call,check_output,CalledProcessError
+    from subprocess import CalledProcessError
     import subprocess
     from raven import Client
 
@@ -47,7 +110,9 @@ def action_file(filepath="", filename=""):
         logger.error("No Sentry DSN in the settings file, errors will not be logged to Sentry")
         raven_client = None
 
-    config = WatchedFolder(record=tree.find('//path[@location="{0}"]'.format(filepath)), raven_client=raven_client)
+   # config = WatchedFolder(record=tree.find('//path[@location="{0}"]'.format(filepath)), raven_client=raven_client)
+    config = WatchedFolder(record=get_location_config(tree,filepath), raven_client=raven_client)
+
     logger.info("config is: {0}".format(config.__dict__))
 
     config.verify()
@@ -56,13 +121,13 @@ def action_file(filepath="", filename=""):
     logger.info("command to run: {0}".format(cmd))
 
     try:
-        output = check_output(format(cmd), shell=True, stderr=subprocess.STDOUT)
+        output = run_command(cmd, concat=True) #(format(cmd), shell=True, stderr=subprocess.STDOUT)
         if len(output)>0:
             logger.info("output: {0}".format(unicode(output)))
         else:
             logger.info("command completed with no output")
 
-    except CalledProcessError as e:
+    except CommandFailed as e:
         logger.error("Command {cmd} failed with exit code {code}. Output was: {out}".format(
             cmd=e.cmd,
             code=e.returncode,
@@ -73,7 +138,8 @@ def action_file(filepath="", filename=""):
                 'triggered_path': filepath,
                 'triggered_file': filename,
                 'return_code': e.returncode,
-                'output': e.output,
+                'stdout': e.stdout_text,
+                'stderr': e.stderr_text,
                 'watcher': config.description,
             })
             raven_client.captureException()
