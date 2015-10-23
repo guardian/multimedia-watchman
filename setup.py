@@ -17,7 +17,7 @@ setup(name='Watchman',
       description='A system which watches folders and executes commands when files are created in the folders',
       author='Andy Gallagher and David Allison',
       author_email='multimediatech@theguardian.com',
-      packages=['watcher', 'watcher_config'],
+      packages=['watcher'],
       scripts=['watcher/watchman'],
       install_requires=['celery', 'certifi', 'raven', 'redis', 'watchdog'],
       data_files=[
@@ -27,7 +27,8 @@ setup(name='Watchman',
         ('/etc', ['/etc/supervisord.conf']),
         ('/etc/init.d', ['/etc/init.d/supervisor']),
         ('/etc/supervisor/conf.d', ['/etc/supervisor/conf.d/watchman.conf']),
-        ('/etc/sysconfig', ['/etc/sysconfig/supervisord'])
+        ('/etc/sysconfig', ['/etc/sysconfig/supervisord']),
+        ('/etc', ['/etc/example_config.xml'])
         ]
      )
 
