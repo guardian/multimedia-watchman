@@ -13,9 +13,9 @@ License: UNKNOWN
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
-Requires: python-devel, python-setuptools
 BuildArch: noarch
 Vendor: Andy Gallagher and David Allison <multimediatech@theguardian.com>
+Requires: python-devel, python-setuptools
 
 %description
 UNKNOWN
