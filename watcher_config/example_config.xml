@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- this file needs to be installed as /etc/ffqueue-config.xml, so that both Celery and Watchman can find it -->
+
+<ffqueue>
+	<global>
+		<!-- Broker for Celery-->
+		<broker-url>***REMOVED***</broker-url>
+		<result-backend>***REMOVED***</result-backend>
+		<!-- If you want to get exceptions reported to Sentry, put a DSN in here -->
+		<!--<raven-dsn></raven-dsn>-->
+	</global>
+
+	<!--add watchfolder definitions here-->
+	<path location="/home/watchfolders/test_one">
+		<debuglevel>5</debuglevel> <!-- the higher the number, the more logging is output -->
+		<desc>Test watchfolder</desc> <!-- indicative name of the watchholder -->
+		<poll-time>5</poll-time>	<!--check this number of seconds -->
+		<stable-time>8</stable-time> <!-- trigger a file if it has not changed after this number of seconds -->
+		<!--you should NOT use relative paths here.... paths are relative to where the daemon was started from, so you don't know...-->
+		<!-- shell command to execute.
+			{filepath} substitutes the full path of the triggered file,
+			{pathname} just the path of the file
+			{filename} just the filename of the file with no directory
+		-->
+		<command>mv {filepath} /vagrant/complete;sleep 2s</command>
+	</path>	
+
+
+</ffqueue>
