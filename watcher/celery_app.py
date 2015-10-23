@@ -13,7 +13,7 @@ CELERY_RESULT_BACKEND = '***REMOVED***'
 app = Celery('watcher',
              broker=BROKER_URL,
              backend=CELERY_RESULT_BACKEND,
-             include=['tasks'])
+             include=['watcher.tasks'])
 
 # Optional configuration, see the application user guide.
 app.conf.update(
