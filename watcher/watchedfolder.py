@@ -1,6 +1,8 @@
 __author__ = 'david_allison'
 
 import logging
+logger = logging.getLogger('WatchedFolder')
+
 
 class WatchedFolder(object):
     """
@@ -25,6 +27,7 @@ class WatchedFolder(object):
         self.command=command
         self.description=""
         self.kennel = None
+        self.ignorelist = []
 
         if record is not None:
             self.location=record.attrib['location']
@@ -32,6 +35,8 @@ class WatchedFolder(object):
             self.polltime=self._safe_get(record, "poll-time")
             self.description=self._safe_get(record, "desc")
             self.command=self._safe_get(record, "command")
+            self.ignorelist=self._safe_get(record,"ignore").split('|')
+            self.check_cds(record)
 
             try:
                 self.polltime = int(self.polltime)
@@ -57,6 +62,24 @@ class WatchedFolder(object):
                     logging.error(traceback.format_exc())
                     iterations = 3
                 self.stable_time = int(iterations) * self.polltime
+
+    def check_cds(self, record):
+        cds_node = record.find('cds')
+        if cds_node is None:
+            return
+
+        cds_cmd = {}
+
+        for child_node in cds_node:
+            cds_cmd[child_node.tag] = child_node.text
+
+        logger.debug("CDS command parameters: {0}".format(cds_cmd))
+        args = []
+        for k,v in cds_cmd.items():
+            args.append("--{0} {1}".format(k,v))
+
+        self.command = "/usr/local/bin/cds_run.pl %s" % " ".join(args)
+        logger.debug("CDS command is {0}".format(self.command))
 
     def __unicode__(self):
         """
@@ -84,3 +107,15 @@ class WatchedFolder(object):
             raise ValueError("Invalid watchfolder: location is not set")
         if self.polltime is None:
             raise ValueError("Invalid watchfolder: polltime is not set")
+
+if __name__ == "__main__":
+    import xml.etree.cElementTree as ET
+    from sys import argv
+    from pprint import pprint
+    print "Running tests on watchedfolder module"
+
+    logging.basicConfig(level=logging.DEBUG)
+    data = ET.parse(argv[1])
+    for record in data.findall("path"):
+        f=WatchedFolder(record=record)
+        pprint(f.__dict__)
