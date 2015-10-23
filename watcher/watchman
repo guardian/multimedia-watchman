@@ -33,7 +33,7 @@ for record in tree.findall("path"):
     f=WatchedFolder(record=record, raven_client=raven_client)
     folders[f.location] = f
     print f.__unicode__()
-    s = WatchDogBasedSystem(location=f.location, stable_time=f.stable_time)
+    s = WatchDogBasedSystem(location=f.location, stable_time=f.stable_time, ignorelist=f.ignorelist)
     s.daemon = True
     folders[f.location].kennel = s
     s.start()

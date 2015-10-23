@@ -12,8 +12,7 @@ class WatchDogBasedSystem(threading.Thread):
 
     from watchdog.events import FileSystemEventHandler
 
-
-    def __init__(self, location=None, poll_delay=1, stable_time=10, recursive=False, *args, **kwargs):
+    def __init__(self, location=None, poll_delay=1, stable_time=10, recursive=False, ignorelist=[], *args, **kwargs):
         """
         Initialise the system
         :param location: (string) Path to the directory to watch
@@ -29,6 +28,7 @@ class WatchDogBasedSystem(threading.Thread):
         self.poll_delay = poll_delay
         self.stable_time = stable_time
         self.recursive = recursive
+        self.ignorelist = ignorelist
 
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s - %(message)s',
@@ -45,7 +45,7 @@ class WatchDogBasedSystem(threading.Thread):
         from tasks import action_file
 
         observer = PollingObserverVFS(os.stat, os.listdir, polling_interval=0.8)
-        event_handler = self.MyEventHandler(observer, list=self.wonderfullist)
+        event_handler = self.MyEventHandler(observer, list=self.wonderfullist, ignorelist=self.ignorelist)
         observer.schedule(event_handler, self.path, recursive=self.recursive)
         observer.start()
         try:
@@ -73,16 +73,22 @@ class WatchDogBasedSystem(threading.Thread):
         """
         Event handler for Watchdog
         """
-        def __init__(self, observer, list=None):
+        def __init__(self, observer, list=None, ignorelist=[]):
             self.observer = observer
             self.wonderfullist = list
+            self.ignorelist = ignorelist
 
         def on_created(self, event):
             """
             Triggered when a file is created
             """
             import time
+            import os
+            file_name, file_extension = os.path.splitext(event.src_path)
             print "e=", event
+
+            if file_extension in self.ignorelist:
+                return
 
             if event.is_directory == False:
 
@@ -96,7 +102,12 @@ class WatchDogBasedSystem(threading.Thread):
             """
             Triggered when a file is modified
             """
+            import os
+            file_name, file_extension = os.path.splitext(event.src_path)
             print "e=", event
+
+            if file_extension in self.ignorelist:
+                return
 
             if event.is_directory == False:
 
