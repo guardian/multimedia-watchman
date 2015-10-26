@@ -112,7 +112,15 @@ def action_file(filepath="", filename=""):
         raven_client = None
 
    # config = WatchedFolder(record=tree.find('//path[@location="{0}"]'.format(filepath)), raven_client=raven_client)
-    config = WatchedFolder(record=get_location_config(tree, filepath), raven_client=raven_client)
+    use_suid_cds = False
+    try:
+        suid_cds = tree.find('/global/suid-cds').text
+        if suid_cds.lower() != 'false':
+            use_suid_cds = True
+    except AttributeError:# if it's not specified, assume we're not using it.
+        pass
+
+    config = WatchedFolder(record=get_location_config(tree, filepath), raven_client=raven_client, suid_cds=use_suid_cds)
 
     logger.info("config is: {0}".format(config.__dict__))
 

@@ -2,7 +2,7 @@
 %define version 1.0
 %define unmangled_version 1.0
 %define unmangled_version 1.0
-%define release 1
+%define release 2
 
 Summary: A system which watches folders and executes commands when files are created in the folders
 Name: %{name}

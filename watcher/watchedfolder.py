@@ -8,7 +8,8 @@ class WatchedFolder(object):
     """
     Code that handles the reading of the XML based configuration file
     """
-    def __init__(self, record=None, location=None, debuglevel=None, polltime=None, stable_time=None, command=None, raven_client=None):
+    def __init__(self, record=None, location=None, debuglevel=None, polltime=None, stable_time=None, command=None,
+                 raven_client=None, suid_cds=False):
         """
         Method which sets default values of various paramarters
         :param record: Misc. data
@@ -28,6 +29,7 @@ class WatchedFolder(object):
         self.description=""
         self.kennel = None
         self.ignorelist = []
+        self.suid_cds = suid_cds
 
         if record is not None:
             self.location=record.attrib['location']
@@ -78,7 +80,13 @@ class WatchedFolder(object):
         for k,v in cds_cmd.items():
             args.append("--{0} {1}".format(k,v))
 
-        self.command = "/usr/local/bin/cds_run.pl %s" % " ".join(args)
+        if self.suid_cds:
+            cds_cmd = "/usr/local/bin/suid_cds"
+        else:
+            cds_cmd = "/usr/local/bin/cds_run.pl"
+
+        self.command = "{cmd} {args}".format(cmd=cds_cmd, args=" ".join(args))
+
         logger.debug("CDS command is {0}".format(self.command))
 
     def __unicode__(self):
