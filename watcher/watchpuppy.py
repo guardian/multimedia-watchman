@@ -9,7 +9,6 @@ class WatchDogBasedSystem(threading.Thread):
     """
     This class represents the watchfolder system based on the 3rd party WatchDog system
     """
-
     from watchdog.events import FileSystemEventHandler
 
     def __init__(self, location=None, poll_delay=1, stable_time=10, recursive=False, ignorelist=[], *args, **kwargs):
@@ -59,8 +58,6 @@ class WatchDogBasedSystem(threading.Thread):
                         print "{0} is More than {1} seconds old".format(path, self.stable_time)
                         action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
                         del self.wonderfullist[path]
-
-
                 sleep(self.poll_delay)
         except KeyboardInterrupt:
             observer.stop()
@@ -91,11 +88,9 @@ class WatchDogBasedSystem(threading.Thread):
                 return
 
             if event.is_directory == False:
-
                 timestamp = time.time()
                 timeint = int(timestamp)
                 self.wonderfullist[event.src_path] = timeint
-
                 print self.wonderfullist
 
         def on_modified(self, event):
