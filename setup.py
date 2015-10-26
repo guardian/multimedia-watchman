@@ -13,7 +13,7 @@ def mkdir_p(path):
         else: raise
 
 setup(name='Watchman',
-      version='0.4',
+      version='1.0',
       description='A system which watches folders and executes commands when files are created in the folders',
       author='Andy Gallagher and David Allison',
       author_email='multimediatech@theguardian.com',
