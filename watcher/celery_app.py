@@ -12,9 +12,6 @@ __author__ = 'david_allison'
 
 tree = ET.parse(CONFIG_FILE)
 
-#BROKER_URL = '***REMOVED***'
-#CELERY_RESULT_BACKEND = '***REMOVED***'
-
 try:
     broker_url = tree.find('/global/broker-url').text
 except StandardError as e:
@@ -36,7 +33,10 @@ app = Celery('watcher',
 app.conf.update(
     CELERY_TASK_RESULT_EXPIRES=3600,
     CELERY_ACCEPT_CONTENT=['json'],
-    CELERY_TASK_SERIALIZER='json'
+    CELERY_TASK_SERIALIZER='json',
+    #see http://docs.celeryproject.org/en/latest/configuration.html#std:setting-CELERYD_PREFETCH_MULTIPLIER
+    CELERYD_CONCURRENCY=20,
+    CELERYD_PREFETCH_MULTIPLIER=1,
 )
 
 
