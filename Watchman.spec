@@ -9,8 +9,8 @@ Name: %{name}
 Version: %{version}
 Release: %{release}
 Source0: %{name}-%{unmangled_version}.tar.gz
-License: UNKNOWN
-Group: Development/Libraries
+License: GNM Internal Software
+Group: Applications/Utilities
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
 BuildArch: noarch
