@@ -24,11 +24,11 @@ setup(name='Watchman',
         # ('watcher_config/supervisord.conf', '/etc/supervisord.conf'),
         # ('watcher_config/initscript/supervisor', '/etc/init.d/supervisor'),
         # ('watcher_config/watchman.conf', '/etc/supervisor/conf.d/watchman.conf')
-        ('/etc', ['/etc/supervisord.conf']),
-        ('/etc/init.d', ['/etc/init.d/supervisor']),
-        ('/etc/supervisor/conf.d', ['/etc/supervisor/conf.d/watchman.conf']),
-        ('/etc/sysconfig', ['/etc/sysconfig/supervisord']),
-        ('/etc', ['/etc/example_config.xml'])
+        ('/etc', ['watcher_config/supervisord.conf']),
+        ('/etc/init.d', ['watcher_config/initscript/supervisor']),
+        ('/etc/supervisor/conf.d', ['watcher_config/watchman.conf']),
+        ('/etc/sysconfig', ['watcher_config/initscript/supervisord']),
+        ('/etc', ['watcher_config/example_config.xml'])
         ]
      )
 
