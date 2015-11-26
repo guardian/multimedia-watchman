@@ -150,5 +150,6 @@ def action_file(filepath="", filename=""):
                 'stdout': e.stdout_text,
                 'stderr': e.stderr_text,
                 'watcher': config.description,
+                'culprit': config.description + "in run_command",
             })
-            raven_client.captureException()
+            raven_client.captureException(e, fingerprint=[config.description, filepath, e.returncode])

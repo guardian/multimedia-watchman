@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 RPMBUILD=${HOME}/rpmbuild
-VERSION='1.0'
+VERSION='1.1'
 
 RPMBUILD=`which rpmbuild`
 if [ "$?" == "1" ]; then
