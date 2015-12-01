@@ -152,4 +152,5 @@ def action_file(filepath="", filename=""):
                 'watcher': config.description,
                 'culprit': config.description + "in run_command",
             })
-            raven_client.captureException(e, fingerprint=[config.description, filepath, e.returncode])
+            raven_client.captureMessage('{w}: Command {0} failed with code {1}'.format(e.cmd,e.returncode,w=config.description),
+                                        extra={'triggered_path': filepath,'return_code': e.returncode, 'watcher': config.description})
