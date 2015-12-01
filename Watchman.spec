@@ -1,7 +1,6 @@
 %define name Watchman
-%define version 1.0
-%define unmangled_version 1.0
-%define unmangled_version 1.0
+%define version 1.1
+%define unmangled_version 1.1
 %define release 3
 
 Summary: A system which watches folders and executes commands when files are created in the folders
