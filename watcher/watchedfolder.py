@@ -42,7 +42,14 @@ class WatchedFolder(object):
 
             try:
                 self.polltime = int(self.polltime)
-            except TypeError as e:
+            except TypeError:
+                import traceback
+                if raven_client:
+                    raven_client.user_context(self.__dict__)
+                    raven_client.captureException()
+                logging.error(traceback.format_exc())
+                self.polltime = 3
+            except ValueError:
                 import traceback
                 if raven_client:
                     raven_client.user_context(self.__dict__)
@@ -64,6 +71,13 @@ class WatchedFolder(object):
                     logging.error(traceback.format_exc())
                     iterations = 3
                 self.stable_time = int(iterations) * self.polltime
+            except ValueError:
+                import traceback
+                if raven_client:
+                    raven_client.user_context(self.__dict__)
+                    raven_client.captureException()
+                logging.error(traceback.format_exc())
+                self.stable_time = 3
 
     def check_cds(self, record):
         cds_node = record.find('cds')
