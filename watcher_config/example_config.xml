@@ -5,8 +5,8 @@
 <ffqueue>
 	<global>
 		<!-- Broker for Celery-->
-		<broker-url>***REMOVED***</broker-url>
-		<result-backend>***REMOVED***</result-backend>
+		<broker-url>**broker url here((</broker-url>
+		<result-backend>**result backend url here**</result-backend>
 		<!-- If you want to get exceptions reported to Sentry, put a DSN in here -->
 		<!--<raven-dsn></raven-dsn>-->
 	</global>
