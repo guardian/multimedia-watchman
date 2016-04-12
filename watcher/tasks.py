@@ -4,6 +4,7 @@ from celery_app import app
 from subprocess import CalledProcessError
 import logging
 
+
 class DSNNotFound(Exception):
     pass
 
@@ -95,19 +96,10 @@ def action_file(filepath="", filename=""):
     import xml.etree.cElementTree as ET
     from watcher.watchedfolder import WatchedFolder
     import os.path
-    from subprocess import CalledProcessError
-    import subprocess
     from raven import Client
     from watcher.global_settings import CONFIG_FILE
-    logging.basicConfig(
-        format='%(asctime)-15s - [%(filename)s] %(threadName)s %(funcname)s: %(levelname)s - %(message)s',
-        level=logging.DEBUG,
-        filename="/var/log/watchman/watchman.log")
-    # This format can be matched in Logstash by: %{PYTIMESTAMP:timestamp}\s*-\s*\[%{DATA:sourcefile}\] %{THREADNAME:thread} %{DATA:function}: %{LOGLEVEL:level} - %{GREEDYDATA:message}
-    # with custom formats:
-    #  PYTIMESTAMP %{YEAR}-%{MONTHNUM}-%{MONTHDAY} \s*%{HOUR}:%{MINUTE}:%{SECOND},%{INT}
-    #  THREADNAME[\w\d\- <>]+
-
+    from logging import LoggerAdapter
+    from global_settings import LOGFORMAT_RUNNER
     tree = ET.parse(CONFIG_FILE)
 
     try:
@@ -127,23 +119,27 @@ def action_file(filepath="", filename=""):
 
     config = WatchedFolder(record=get_location_config(tree, filepath), raven_client=raven_client, suid_cds=use_suid_cds)
 
-    logging.debug("config is: {0}".format(config.__dict__))
+    temp = logging.getLogger('watcher.tasks')
+    temp.basicConfig(format=LOGFORMAT_RUNNER)
+
+    logger = LoggerAdapter(temp,{'watchfolder': config.description})
+    logger.debug("config is: {0}".format(config.__dict__))
 
     config.verify()
 
     cmd = config.command.format(pathonly='"'+filepath+'"', filename='"'+filename+'"', filepath='"'+os.path.join(filepath, filename)+'"')
-    logging.info("command to run: {0}".format(cmd))
+    logger.info("command to run: {0}".format(cmd))
 
     try:
         output = run_command(cmd, concat=True) #(format(cmd), shell=True, stderr=subprocess.STDOUT)
         if len(output)>0:
-            logging.debug("output: {0}".format(unicode(output)))
+            logger.debug("output: {0}".format(unicode(output)))
         else:
-            logging.debug("command completed with no output")
-        logging.info("Command completed without error")
+            logger.debug("command completed with no output")
+        logger.info("Command completed without error")
 
     except CommandFailed as e:
-        logging.error("Command {cmd} failed with exit code {code}. Output was: {out}".format(
+        logger.error("Command {cmd} failed with exit code {code}. Output was: {out}".format(
             cmd=e.cmd,
             code=e.returncode,
             out=e.output,

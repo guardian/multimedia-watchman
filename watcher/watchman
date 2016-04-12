@@ -9,11 +9,11 @@ from watcher.watchedfolder import WatchedFolder
 from raven import Client as RavenClient
 from watcher.tasks import get_dsn, DSNNotFound
 import logging
-from watcher.global_settings import CONFIG_FILE
+from watcher.global_settings import CONFIG_FILE,LOGFORMAT,LOGLEVEL,LOGFILE
 
-logging.basicConfig(format='%(asctime)-15s - [%(filename)s] %(threadName)s %(funcname)s: %(levelname)s - %(message)s',
-                    level=logging.DEBUG,
-                    filename="/var/log/watchman/watchman.log")
+logging.basicConfig(format=LOGFORMAT,
+                    level=LOGLEVEL,
+                    filename=LOGFILE)
 #This format can be matched in Logstash by: %{PYTIMESTAMP:timestamp}\s*-\s*\[%{DATA:sourcefile}\] %{THREADNAME:thread} %{DATA:function}: %{LOGLEVEL:level} - %{GREEDYDATA:message}
 #with custom formats:
 #  PYTIMESTAMP %{YEAR}-%{MONTHNUM}-%{MONTHDAY} \s*%{HOUR}:%{MINUTE}:%{SECOND},%{INT}

@@ -6,7 +6,7 @@ from watcher.global_settings import CONFIG_FILE
 import logging
 
 logging.basicConfig(
-    format='%(asctime)-15s - [%(filename)s] %(threadName)s %(funcname)s: %(levelname)s - %(message)s',
+    format='%(asctime)-15s - [%(filename)s] %(threadName)s %(funcName)s: %(levelname)s - %(message)s',
     level=logging.DEBUG,
     filename="/var/log/watchman/watchman.log")
 # This format can be matched in Logstash by: %{PYTIMESTAMP:timestamp}\s*-\s*\[%{DATA:sourcefile}\] %{THREADNAME:thread} %{DATA:function}: %{LOGLEVEL:level} - %{GREEDYDATA:message}
