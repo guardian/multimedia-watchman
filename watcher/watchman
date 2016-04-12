@@ -11,6 +11,8 @@ from watcher.tasks import get_dsn, DSNNotFound
 import logging
 from watcher.global_settings import CONFIG_FILE
 
+logging.basicConfig(format='%(asctime)-15s - [%(filename)s] %(threadName)s %(funcname)s: %(levelname)s - %(message)s',level=logging.DEBUG)
+
 """
 Main Python file that should be called to execute the Watchman system.
 Please note that we are loading the XML file with a hardcoded name and path due to tasks.py also needing to access the same file.
@@ -32,7 +34,8 @@ except DSNNotFound:
 for record in tree.findall("path"):
     f=WatchedFolder(record=record, raven_client=raven_client)
     folders[f.location] = f
-    print f.__unicode__()
+    logging.info("Setting up watched folder at {0}, stable time is {1}.".format(f.location,f.stable_time))
+    logging.debug("Watched folder {0} has ignorelist {1}".format(f.location,f.ignorelist))
     s = WatchDogBasedSystem(location=f.location, stable_time=f.stable_time, ignorelist=f.ignorelist)
     s.daemon = True
     folders[f.location].kennel = s

@@ -1,7 +1,7 @@
 __author__ = 'david_allison'
 
 from celery_app import app
-
+from subprocess import CalledProcessError
 import logging
 
 logger = logging.getLogger('watchman.tasks')
@@ -25,7 +25,7 @@ def get_dsn(settingsdoc, raise_exception=False):
         else:
             return None
 
-from subprocess import CalledProcessError
+
 class CommandFailed(CalledProcessError):
     """
     Upgraded eversion of CalledProcessError to hold command outputs as well
