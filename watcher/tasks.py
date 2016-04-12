@@ -119,29 +119,22 @@ def action_file(filepath="", filename=""):
 
     config = WatchedFolder(record=get_location_config(tree, filepath), raven_client=raven_client, suid_cds=use_suid_cds)
 
-    temp = logging.getLogger('watcher.tasks')
-    h = logging.Handler(level=LOGLEVEL)
-    h.setFormatter(logging.Formatter(LOGFORMAT_RUNNER))
-    temp.addHandler(h)
-
-    logger = LoggerAdapter(temp,{'watchfolder': config.description})
-    logger.debug("config is: {0}".format(config.__dict__))
-
     config.verify()
 
     cmd = config.command.format(pathonly='"'+filepath+'"', filename='"'+filename+'"', filepath='"'+os.path.join(filepath, filename)+'"')
-    logger.info("command to run: {0}".format(cmd))
+    logging.info("({1}) command to run: {0}".format(cmd, config.description))
 
     try:
         output = run_command(cmd, concat=True) #(format(cmd), shell=True, stderr=subprocess.STDOUT)
         if len(output)>0:
-            logger.debug("output: {0}".format(unicode(output)))
+            logging.debug("({1}) output: {0}".format(unicode(output), config.description))
         else:
-            logger.debug("command completed with no output")
-        logger.info("Command completed without error")
+            logging.debug("({0}) command completed with no output".format(config.description))
+            logging.info("({0}) Command completed without error".format(config.description))
 
     except CommandFailed as e:
-        logger.error("Command {cmd} failed with exit code {code}. Output was: {out}".format(
+        logging.error("({d}) Command {cmd} failed with exit code {code}. Output was: {out}".format(
+            d=config.description,
             cmd=e.cmd,
             code=e.returncode,
             out=e.output,

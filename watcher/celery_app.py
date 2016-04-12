@@ -2,17 +2,13 @@ from __future__ import absolute_import
 
 from celery import Celery
 import xml.etree.cElementTree as ET
-from watcher.global_settings import CONFIG_FILE
+from watcher.global_settings import CONFIG_FILE,LOGFORMAT,LOGLEVEL,LOGFILE
 import logging
 
 logging.basicConfig(
-    format='%(asctime)-15s - [%(filename)s] %(threadName)s %(funcName)s: %(levelname)s - %(message)s',
-    level=logging.DEBUG,
-    filename="/var/log/watchman/watchman.log")
-# This format can be matched in Logstash by: %{PYTIMESTAMP:timestamp}\s*-\s*\[%{DATA:sourcefile}\] %{THREADNAME:thread} %{DATA:function}: %{LOGLEVEL:level} - %{GREEDYDATA:message}
-# with custom formats:
-#  PYTIMESTAMP %{YEAR}-%{MONTHNUM}-%{MONTHDAY} \s*%{HOUR}:%{MINUTE}:%{SECOND},%{INT}
-#  THREADNAME[\w\d\- <>]+
+    format=LOGFORMAT,
+    level=LOGLEVEL,
+    filename=LOGFILE)
 """
 Various setting for Celery
 """
