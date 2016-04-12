@@ -4,6 +4,13 @@ from celery_app import app
 from subprocess import CalledProcessError
 import logging
 
+logging.basicConfig(format='%(asctime)-15s - [%(filename)s] %(threadName)s %(funcname)s: %(levelname)s - %(message)s',
+                    level=logging.DEBUG,
+                    filename="/var/log/watchman/watchman.log")
+# This format can be matched in Logstash by: %{PYTIMESTAMP:timestamp}\s*-\s*\[%{DATA:sourcefile}\] %{THREADNAME:thread} %{DATA:function}: %{LOGLEVEL:level} - %{GREEDYDATA:message}
+# with custom formats:
+#  PYTIMESTAMP %{YEAR}-%{MONTHNUM}-%{MONTHDAY} \s*%{HOUR}:%{MINUTE}:%{SECOND},%{INT}
+#  THREADNAME[\w\d\- <>]+
 logger = logging.getLogger('watchman.tasks')
 
 
