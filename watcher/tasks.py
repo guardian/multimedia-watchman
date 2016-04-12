@@ -99,7 +99,7 @@ def action_file(filepath="", filename=""):
     from raven import Client
     from watcher.global_settings import CONFIG_FILE
     from logging import LoggerAdapter
-    from global_settings import LOGFORMAT_RUNNER
+    from global_settings import LOGFORMAT_RUNNER,LOGLEVEL
     tree = ET.parse(CONFIG_FILE)
 
     try:
@@ -120,7 +120,9 @@ def action_file(filepath="", filename=""):
     config = WatchedFolder(record=get_location_config(tree, filepath), raven_client=raven_client, suid_cds=use_suid_cds)
 
     temp = logging.getLogger('watcher.tasks')
-    temp.basicConfig(format=LOGFORMAT_RUNNER)
+    h = logging.Handler(level=LOGLEVEL)
+    h.setFormatter(logging.Formatter(LOGFORMAT_RUNNER))
+    temp.addHandler(h)
 
     logger = LoggerAdapter(temp,{'watchfolder': config.description})
     logger.debug("config is: {0}".format(config.__dict__))
