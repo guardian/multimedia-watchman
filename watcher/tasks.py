@@ -1,10 +1,8 @@
 __author__ = 'david_allison'
 
 from celery_app import app
-
+from subprocess import CalledProcessError
 import logging
-
-logger = logging.getLogger('watchman.tasks')
 
 
 class DSNNotFound(Exception):
@@ -25,7 +23,7 @@ def get_dsn(settingsdoc, raise_exception=False):
         else:
             return None
 
-from subprocess import CalledProcessError
+
 class CommandFailed(CalledProcessError):
     """
     Upgraded eversion of CalledProcessError to hold command outputs as well
@@ -98,17 +96,16 @@ def action_file(filepath="", filename=""):
     import xml.etree.cElementTree as ET
     from watcher.watchedfolder import WatchedFolder
     import os.path
-    from subprocess import CalledProcessError
-    import subprocess
     from raven import Client
     from watcher.global_settings import CONFIG_FILE
-
+    from logging import LoggerAdapter
+    from global_settings import LOGFORMAT_RUNNER,LOGLEVEL
     tree = ET.parse(CONFIG_FILE)
 
     try:
         raven_client = Client(get_dsn(tree), raise_exception=True)
     except DSNNotFound:
-        logger.error("No Sentry DSN in the settings file, errors will not be logged to Sentry")
+        logging.error("No Sentry DSN in the settings file, errors will not be logged to Sentry")
         raven_client = None
 
    # config = WatchedFolder(record=tree.find('//path[@location="{0}"]'.format(filepath)), raven_client=raven_client)
@@ -122,22 +119,22 @@ def action_file(filepath="", filename=""):
 
     config = WatchedFolder(record=get_location_config(tree, filepath), raven_client=raven_client, suid_cds=use_suid_cds)
 
-    logger.info("config is: {0}".format(config.__dict__))
-
     config.verify()
 
     cmd = config.command.format(pathonly='"'+filepath+'"', filename='"'+filename+'"', filepath='"'+os.path.join(filepath, filename)+'"')
-    logger.info("command to run: {0}".format(cmd))
+    logging.info("({1}) command to run: {0}".format(cmd, config.description))
 
     try:
         output = run_command(cmd, concat=True) #(format(cmd), shell=True, stderr=subprocess.STDOUT)
         if len(output)>0:
-            logger.info("output: {0}".format(unicode(output)))
+            logging.debug("({1}) output: {0}".format(unicode(output), config.description))
         else:
-            logger.info("command completed with no output")
+            logging.debug("({0}) command completed with no output".format(config.description))
+            logging.info("({0}) Command completed without error".format(config.description))
 
     except CommandFailed as e:
-        logger.error("Command {cmd} failed with exit code {code}. Output was: {out}".format(
+        logging.error("({d}) Command {cmd} failed with exit code {code}. Output was: {out}".format(
+            d=config.description,
             cmd=e.cmd,
             code=e.returncode,
             out=e.output,

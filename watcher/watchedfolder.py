@@ -1,7 +1,7 @@
-__author__ = 'david_allison'
-
 import logging
 logger = logging.getLogger('WatchedFolder')
+
+__author__ = 'david_allison'
 
 
 class WatchedFolder(object):
@@ -78,6 +78,7 @@ class WatchedFolder(object):
                     raven_client.captureException()
                 logging.error(traceback.format_exc())
                 self.stable_time = 3
+        logger.info("Set up {0}".format(unicode(self)))
 
     def check_cds(self, record):
         cds_node = record.find('cds')
