@@ -5,6 +5,14 @@ import xml.etree.cElementTree as ET
 from watcher.global_settings import CONFIG_FILE
 import logging
 
+logging.basicConfig(
+    format='%(asctime)-15s - [%(filename)s] %(threadName)s %(funcname)s: %(levelname)s - %(message)s',
+    level=logging.DEBUG,
+    filename="/var/log/watchman/watchman.log")
+# This format can be matched in Logstash by: %{PYTIMESTAMP:timestamp}\s*-\s*\[%{DATA:sourcefile}\] %{THREADNAME:thread} %{DATA:function}: %{LOGLEVEL:level} - %{GREEDYDATA:message}
+# with custom formats:
+#  PYTIMESTAMP %{YEAR}-%{MONTHNUM}-%{MONTHDAY} \s*%{HOUR}:%{MINUTE}:%{SECOND},%{INT}
+#  THREADNAME[\w\d\- <>]+
 """
 Various setting for Celery
 """
@@ -39,6 +47,7 @@ app.conf.update(
     #see http://docs.celeryproject.org/en/latest/configuration.html#std:setting-CELERYD_PREFETCH_MULTIPLIER
     CELERYD_CONCURRENCY=20,
     CELERYD_PREFETCH_MULTIPLIER=1,
+    CELERYD_HIJACK_ROOT_LOGGER=False,
 )
 
 
