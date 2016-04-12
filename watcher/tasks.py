@@ -4,16 +4,6 @@ from celery_app import app
 from subprocess import CalledProcessError
 import logging
 
-logging.basicConfig(format='%(asctime)-15s - [%(filename)s] %(threadName)s %(funcname)s: %(levelname)s - %(message)s',
-                    level=logging.DEBUG,
-                    filename="/var/log/watchman/watchman.log")
-# This format can be matched in Logstash by: %{PYTIMESTAMP:timestamp}\s*-\s*\[%{DATA:sourcefile}\] %{THREADNAME:thread} %{DATA:function}: %{LOGLEVEL:level} - %{GREEDYDATA:message}
-# with custom formats:
-#  PYTIMESTAMP %{YEAR}-%{MONTHNUM}-%{MONTHDAY} \s*%{HOUR}:%{MINUTE}:%{SECOND},%{INT}
-#  THREADNAME[\w\d\- <>]+
-logger = logging.getLogger('watchman.tasks')
-
-
 class DSNNotFound(Exception):
     pass
 
@@ -109,13 +99,21 @@ def action_file(filepath="", filename=""):
     import subprocess
     from raven import Client
     from watcher.global_settings import CONFIG_FILE
+    logging.basicConfig(
+        format='%(asctime)-15s - [%(filename)s] %(threadName)s %(funcname)s: %(levelname)s - %(message)s',
+        level=logging.DEBUG,
+        filename="/var/log/watchman/watchman.log")
+    # This format can be matched in Logstash by: %{PYTIMESTAMP:timestamp}\s*-\s*\[%{DATA:sourcefile}\] %{THREADNAME:thread} %{DATA:function}: %{LOGLEVEL:level} - %{GREEDYDATA:message}
+    # with custom formats:
+    #  PYTIMESTAMP %{YEAR}-%{MONTHNUM}-%{MONTHDAY} \s*%{HOUR}:%{MINUTE}:%{SECOND},%{INT}
+    #  THREADNAME[\w\d\- <>]+
 
     tree = ET.parse(CONFIG_FILE)
 
     try:
         raven_client = Client(get_dsn(tree), raise_exception=True)
     except DSNNotFound:
-        logger.error("No Sentry DSN in the settings file, errors will not be logged to Sentry")
+        logging.error("No Sentry DSN in the settings file, errors will not be logged to Sentry")
         raven_client = None
 
    # config = WatchedFolder(record=tree.find('//path[@location="{0}"]'.format(filepath)), raven_client=raven_client)
@@ -129,22 +127,23 @@ def action_file(filepath="", filename=""):
 
     config = WatchedFolder(record=get_location_config(tree, filepath), raven_client=raven_client, suid_cds=use_suid_cds)
 
-    logger.info("config is: {0}".format(config.__dict__))
+    logging.debug("config is: {0}".format(config.__dict__))
 
     config.verify()
 
     cmd = config.command.format(pathonly='"'+filepath+'"', filename='"'+filename+'"', filepath='"'+os.path.join(filepath, filename)+'"')
-    logger.info("command to run: {0}".format(cmd))
+    logging.info("command to run: {0}".format(cmd))
 
     try:
         output = run_command(cmd, concat=True) #(format(cmd), shell=True, stderr=subprocess.STDOUT)
         if len(output)>0:
-            logger.info("output: {0}".format(unicode(output)))
+            logging.debug("output: {0}".format(unicode(output)))
         else:
-            logger.info("command completed with no output")
+            logging.debug("command completed with no output")
+        logging.info("Command completed without error")
 
     except CommandFailed as e:
-        logger.error("Command {cmd} failed with exit code {code}. Output was: {out}".format(
+        logging.error("Command {cmd} failed with exit code {code}. Output was: {out}".format(
             cmd=e.cmd,
             code=e.returncode,
             out=e.output,
