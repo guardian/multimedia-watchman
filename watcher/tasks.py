@@ -5,6 +5,7 @@ from subprocess import CalledProcessError
 import logging
 from threading import Thread
 
+
 class DSNNotFound(Exception):
     pass
 
@@ -137,8 +138,11 @@ def action_file(filepath="", filename=""):
     """
     import xml.etree.cElementTree as ET
     from watcher.watchedfolder import WatchedFolder
+    import os.path
     from raven import Client
     from watcher.global_settings import CONFIG_FILE
+    from logging import LoggerAdapter
+    from global_settings import LOGFORMAT_RUNNER,LOGLEVEL
     tree = ET.parse(CONFIG_FILE)
 
     try:
