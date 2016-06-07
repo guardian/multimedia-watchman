@@ -87,12 +87,10 @@ def get_location_config(tree, loc):
 @app.task
 def action_file(filepath="", filename=""):
     """
-
     Submits the task to Celery, executes the Linux command, records information in the Celery log, and submits any errors to Sentry via Raven
     :param filepath: Path of the file to be acted on
     :param filename: Name of the file to be acted on
     """
-
     import xml.etree.cElementTree as ET
     from watcher.watchedfolder import WatchedFolder
     import os.path
@@ -121,33 +119,34 @@ def action_file(filepath="", filename=""):
 
     config.verify()
 
-    cmd = config.command.format(pathonly='"'+filepath+'"', filename='"'+filename+'"', filepath='"'+os.path.join(filepath, filename)+'"')
-    logging.info("({1}) command to run: {0}".format(cmd, config.description))
+    for command in config.commandlist:
+        cmd = command.format(pathonly='"'+filepath+'"', filename='"'+filename+'"', filepath='"'+os.path.join(filepath, filename)+'"')
+        logging.info("({1}) command to run: {0}".format(cmd, config.description))
 
-    try:
-        output = run_command(cmd, concat=True) #(format(cmd), shell=True, stderr=subprocess.STDOUT)
-        if len(output)>0:
-            logging.debug("({1}) output: {0}".format(unicode(output), config.description))
-        else:
-            logging.debug("({0}) command completed with no output".format(config.description))
-            logging.info("({0}) Command completed without error".format(config.description))
+        try:
+            output = run_command(cmd, concat=True) #(format(cmd), shell=True, stderr=subprocess.STDOUT)
+            if len(output)>0:
+                logging.debug("({1}) output: {0}".format(unicode(output), config.description))
+            else:
+                logging.debug("({0}) command completed with no output".format(config.description))
+                logging.info("({0}) Command completed without error".format(config.description))
 
-    except CommandFailed as e:
-        logging.error("({d}) Command {cmd} failed with exit code {code}. Output was: {out}".format(
-            d=config.description,
-            cmd=e.cmd,
-            code=e.returncode,
-            out=e.output,
-        ))
-        if raven_client is not None:
-            raven_client.user_context({
-                'triggered_path': filepath,
-                'triggered_file': filename,
-                'return_code': e.returncode,
-                'stdout': e.stdout_text,
-                'stderr': e.stderr_text,
-                'watcher': config.description,
-                'culprit': config.description + "in run_command",
-            })
-            raven_client.captureMessage('{w}: Command failed with code {rtn}'.format(rtn=e.returncode,w=config.description),
-                                        extra={'triggered_path': filepath,'return_code': e.returncode, 'watcher': config.description})
+        except CommandFailed as e:
+            logging.error("({d}) Command {cmd} failed with exit code {code}. Output was: {out}".format(
+                d=config.description,
+                cmd=e.cmd,
+                code=e.returncode,
+                out=e.output,
+            ))
+            if raven_client is not None:
+                raven_client.user_context({
+                    'triggered_path': filepath,
+                    'triggered_file': filename,
+                    'return_code': e.returncode,
+                    'stdout': e.stdout_text,
+                    'stderr': e.stderr_text,
+                    'watcher': config.description,
+                    'culprit': config.description + "in run_command",
+                })
+                raven_client.captureMessage('{w}: Command failed with code {rtn}'.format(rtn=e.returncode,w=config.description),
+                                            extra={'triggered_path': filepath,'return_code': e.returncode, 'watcher': config.description})
