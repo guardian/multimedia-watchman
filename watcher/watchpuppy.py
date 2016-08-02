@@ -68,6 +68,8 @@ class WatchDogBasedSystem(threading.Thread):
                             action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
                             blacklist.setnx(os.path.dirname(path)+os.path.basename(path), os.path.dirname(path)+os.path.basename(path))
                             blacklist.expire(os.path.dirname(path)+os.path.basename(path), 360)
+                        else:
+                            self.logger.info("System tried to trigger on {0} but was stopped by the blacklist".format(path))
 
                         del self.wonderfullist[path]
                 sleep(self.poll_delay)
