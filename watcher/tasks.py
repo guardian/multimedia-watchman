@@ -100,6 +100,7 @@ def action_file(filepath="", filename=""):
     from watcher.global_settings import CONFIG_FILE
     from logging import LoggerAdapter
     from global_settings import LOGFORMAT_RUNNER,LOGLEVEL
+    from redis import StrictRedis
     tree = ET.parse(CONFIG_FILE)
 
     try:
@@ -116,6 +117,25 @@ def action_file(filepath="", filename=""):
             use_suid_cds = True
     except AttributeError:# if it's not specified, assume we're not using it.
         pass
+
+    try:
+        password = tree.find('/global/password').text
+    except StandardError as e:
+        password = ""
+
+    try:
+        expire = tree.find('/global/expire').text
+        expire = int(expire)
+    except StandardError as e:
+        expire = 360
+
+    blacklist = StrictRedis(password=password,db=1)
+
+    if blacklist.exists(filepath+filename):
+        blacklist.setnx(filepath+filename, filepath+filename)
+        blacklist.expire(filepath+filename, expire)
+        logging.info("Celery tried to process {0} but was stopped by the blacklist".format(filepath+filename))
+        return
 
     config = WatchedFolder(record=get_location_config(tree, filepath), raven_client=raven_client, suid_cds=use_suid_cds)
 
