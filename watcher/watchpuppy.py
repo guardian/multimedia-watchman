@@ -38,12 +38,14 @@ class WatchDogBasedSystem(threading.Thread):
         from watchdog.observers.polling import PollingObserver,PollingObserverVFS
         import os
         from tasks import action_file
+        from redis import StrictRedis
 
         self.logger.info("Starting watchpuppy on {0}".format(self.path))
         observer = PollingObserverVFS(os.stat, os.listdir, polling_interval=0.8)
         event_handler = self.MyEventHandler(observer, list=self.wonderfullist, ignorelist=self.ignorelist)
         observer.schedule(event_handler, self.path, recursive=self.recursive)
         observer.start()
+        blacklist = StrictRedis(db=1)
 
         try:
             while True:
@@ -53,7 +55,10 @@ class WatchDogBasedSystem(threading.Thread):
                     self.logger.debug("checking {0} with time {1}".format(path,ts))
                     if ts < (timeint2 - self.stable_time):
                         self.logger.info("{0} is More than {1} seconds old, so triggering".format(path, self.stable_time))
-                        action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
+                        if not blacklist.exists(os.path.dirname(path)+os.path.basename(path)):
+                            action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
+                            blacklist.setnx(os.path.dirname(path)+os.path.basename(path), os.path.dirname(path)+os.path.basename(path))
+                            blacklist.expire(os.path.dirname(path)+os.path.basename(path), 360)
 
                         del self.wonderfullist[path]
                 sleep(self.poll_delay)
