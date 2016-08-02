@@ -129,7 +129,7 @@ def action_file(filepath="", filename=""):
     except StandardError as e:
         expire = 360
 
-    blacklist = StrictRedis(password=password,db=1)
+    blacklist = StrictRedis(password=password,db=2)
 
     if blacklist.exists(filepath+filename):
         blacklist.setnx(filepath+filename, filepath+filename)
