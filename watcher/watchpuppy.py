@@ -39,13 +39,22 @@ class WatchDogBasedSystem(threading.Thread):
         import os
         from tasks import action_file
         from redis import StrictRedis
+        import xml.etree.cElementTree as ET
+        from watcher.global_settings import CONFIG_FILE
+
+        tree = ET.parse(CONFIG_FILE)
+
+        try:
+            password = tree.find('/global/password').text
+        except StandardError as e:
+            password = ""
 
         self.logger.info("Starting watchpuppy on {0}".format(self.path))
         observer = PollingObserverVFS(os.stat, os.listdir, polling_interval=0.8)
         event_handler = self.MyEventHandler(observer, list=self.wonderfullist, ignorelist=self.ignorelist)
         observer.schedule(event_handler, self.path, recursive=self.recursive)
         observer.start()
-        blacklist = StrictRedis(db=1)
+        blacklist = StrictRedis(password=password,db=1)
 
         try:
             while True:
