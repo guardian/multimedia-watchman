@@ -49,6 +49,12 @@ class WatchDogBasedSystem(threading.Thread):
         except StandardError as e:
             password = ""
 
+        try:
+            expire = tree.find('/global/expire').text
+            expire = int(expire)
+        except StandardError as e:
+            expire = 360
+
         self.logger.info("Starting watchpuppy on {0}".format(self.path))
         observer = PollingObserverVFS(os.stat, os.listdir, polling_interval=0.8)
         event_handler = self.MyEventHandler(observer, list=self.wonderfullist, ignorelist=self.ignorelist)
@@ -67,7 +73,7 @@ class WatchDogBasedSystem(threading.Thread):
                         if not blacklist.exists(os.path.dirname(path)+os.path.basename(path)):
                             action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
                             blacklist.setnx(os.path.dirname(path)+os.path.basename(path), os.path.dirname(path)+os.path.basename(path))
-                            blacklist.expire(os.path.dirname(path)+os.path.basename(path), 360)
+                            blacklist.expire(os.path.dirname(path)+os.path.basename(path), expire)
                         else:
                             self.logger.info("System tried to trigger on {0} but was stopped by the blacklist".format(path))
 
