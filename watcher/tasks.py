@@ -3,7 +3,8 @@ __author__ = 'david_allison'
 from celery_app import app
 from subprocess import CalledProcessError
 import logging
-
+from datetime import datetime
+import pytz
 
 class DSNNotFound(Exception):
     pass
@@ -100,7 +101,7 @@ def action_file(filepath="", filename=""):
     from watcher.global_settings import CONFIG_FILE
     from logging import LoggerAdapter
     from global_settings import LOGFORMAT_RUNNER,LOGLEVEL
-    from redis import StrictRedis
+    from blacklist import WatchmanBlacklist
     tree = ET.parse(CONFIG_FILE)
 
     try:
@@ -109,32 +110,17 @@ def action_file(filepath="", filename=""):
         logging.error("No Sentry DSN in the settings file, errors will not be logged to Sentry")
         raven_client = None
 
-   # config = WatchedFolder(record=tree.find('//path[@location="{0}"]'.format(filepath)), raven_client=raven_client)
     use_suid_cds = False
-    try:
-        suid_cds = tree.find('/global/suid-cds').text
-        if suid_cds.lower() != 'false':
-            use_suid_cds = True
-    except AttributeError:# if it's not specified, assume we're not using it.
-        pass
 
-    try:
-        password = tree.find('/global/password').text
-    except StandardError as e:
-        password = ""
+    blacklist = WatchmanBlacklist(config_xml=tree)
 
-    try:
-        expire = tree.find('/global/expire').text
-        expire = int(expire)
-    except StandardError as e:
-        expire = 360
-
-    blacklist = StrictRedis(password=password,db=2)
-
-    if blacklist.exists(filepath+filename):
-        blacklist.setnx(filepath+filename, filepath+filename)
-        blacklist.expire(filepath+filename, expire)
-        logging.info("Celery tried to process {0} but was stopped by the blacklist".format(filepath+filename))
+    lock_ts = blacklist.get(filepath+filename)
+    
+    if lock_ts is not None:
+        locktime = datetime.fromtimestamp(lock_ts, pytz.utc)
+        logging.warning(
+            "System tried to trigger on {0} but was stopped by the blacklist from {1}".format(path, locktime))
+    
         return
 
     config = WatchedFolder(record=get_location_config(tree, filepath), raven_client=raven_client, suid_cds=use_suid_cds)

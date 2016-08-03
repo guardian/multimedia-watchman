@@ -1,6 +1,8 @@
 import threading
 from time import sleep, time
 import logging
+from datetime import datetime
+import pytz
 
 __author__ = 'david_allison'
 
@@ -38,29 +40,15 @@ class WatchDogBasedSystem(threading.Thread):
         from watchdog.observers.polling import PollingObserver,PollingObserverVFS
         import os
         from tasks import action_file
-        from redis import StrictRedis
-        import xml.etree.cElementTree as ET
-        from watcher.global_settings import CONFIG_FILE
-
-        tree = ET.parse(CONFIG_FILE)
-
-        try:
-            password = tree.find('/global/password').text
-        except StandardError as e:
-            password = ""
-
-        try:
-            expire = tree.find('/global/expire').text
-            expire = int(expire)
-        except StandardError as e:
-            expire = 360
-
+        from blacklist import WatchmanBlacklist
+        
+        blacklist = WatchmanBlacklist()
+        
         self.logger.info("Starting watchpuppy on {0}".format(self.path))
         observer = PollingObserverVFS(os.stat, os.listdir, polling_interval=0.8)
         event_handler = self.MyEventHandler(observer, list=self.wonderfullist, ignorelist=self.ignorelist)
         observer.schedule(event_handler, self.path, recursive=self.recursive)
         observer.start()
-        blacklist = StrictRedis(password=password,db=1)
 
         try:
             while True:
@@ -70,12 +58,13 @@ class WatchDogBasedSystem(threading.Thread):
                     self.logger.debug("checking {0} with time {1}".format(path,ts))
                     if ts < (timeint2 - self.stable_time):
                         self.logger.info("{0} is More than {1} seconds old, so triggering".format(path, self.stable_time))
-                        if not blacklist.exists(os.path.dirname(path)+os.path.basename(path)):
+                        cache_key = os.path.dirname(path)+os.path.basename(path)
+                        original_ts = blacklist.get(cache_key, update=True, value=timeint2)
+                        if original_ts is None:
                             action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
-                            blacklist.setnx(os.path.dirname(path)+os.path.basename(path), os.path.dirname(path)+os.path.basename(path))
-                            blacklist.expire(os.path.dirname(path)+os.path.basename(path), expire)
                         else:
-                            self.logger.info("System tried to trigger on {0} but was stopped by the blacklist".format(path))
+                            locktime = datetime.fromtimestamp(original_ts,pytz.utc)
+                            self.logger.warning("System tried to trigger on {0} but was stopped by the blacklist from {1}".format(path,locktime))
 
                         del self.wonderfullist[path]
                 sleep(self.poll_delay)
