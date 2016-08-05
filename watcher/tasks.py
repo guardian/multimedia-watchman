@@ -114,7 +114,7 @@ def action_file(filepath="", filename=""):
 
     blacklist = WatchmanBlacklist(config_xml=tree)
 
-    lock_ts = blacklist.get(filepath+filename)
+    lock_ts = blacklist.get("task_"+filepath+filename)
     
     if lock_ts is not None:
         locktime = datetime.fromtimestamp(lock_ts, pytz.utc)
