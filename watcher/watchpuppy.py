@@ -63,8 +63,9 @@ class WatchDogBasedSystem(threading.Thread):
                         if original_ts is None:
                             action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
                         else:
-                            locktime = datetime.fromtimestamp(original_ts,pytz.utc)
-                            self.logger.warning("System tried to trigger on {0} but was stopped by the blacklist from {1}".format(path,locktime))
+                            self.logger.warning("System tried to trigger on {0} but was stopped by the blacklist".format(path))
+                            #locktime = datetime.fromtimestamp(original_ts,pytz.utc)
+                            #self.logger.warning("System tried to trigger on {0} but was stopped by the blacklist from {1}".format(path,locktime))
 
                         del self.wonderfullist[path]
                 sleep(self.poll_delay)
