@@ -10,8 +10,8 @@ class WatchmanBlacklist(object):
     def __init__(self, config_xml = None):
         if config_xml is None:
             config_xml = ET.parse(CONFIG_FILE)
-        elif not isinstance(config_xml,ET.Element) and not isinstance(config_xml,ET.ElementTree):
-            raise TypeError("config_xml must be either None or an ElementTree element")
+        #elif not isinstance(config_xml,ET.Element) and not isinstance(config_xml,ET.ElementTree):
+        #    raise TypeError("config_xml must be either None or an ElementTree element")
         
         try:
             password = config_xml.find('/global/password').text
