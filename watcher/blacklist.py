@@ -34,7 +34,7 @@ class WatchmanBlacklist(object):
 
         self._conn = StrictRedis(password=password, db=dbnum)
         
-    def get(self,filepath,update=False,value="(locked)"):
+    def get(self,filepath,update=True,value="(locked)"):
         """
         Check if the given path is in the blacklist, and optionally update the lock whether or not it exists
         :param filepath: file path to check
@@ -45,12 +45,12 @@ class WatchmanBlacklist(object):
         
         rtn = self._conn.get(filepath)
             
-        if update:
+        #if update:
+        #    self._conn.setnx(filepath, value)
+        #    self._conn.expire(filepath, self.expire)
+
+        if not self._conn.exists(filepath):
             self._conn.setnx(filepath, value)
             self._conn.expire(filepath, self.expire)
-        else:
-            if not self._conn.exists(filepath):
-                self._conn.setnx(filepath, value)
-                self._conn.expire(filepath, self.expire)
         
         return rtn
