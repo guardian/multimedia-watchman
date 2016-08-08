@@ -167,7 +167,7 @@ def action_file(filepath="", filename=""):
     lock_ts = blacklist.get("task_"+filepath+filename)
 
     if lock_ts is not None:
-        logging.warning("Celery tried to process {0} but was stopped by the blacklist".format(filepath+filename))
+        logging.warning("Celery tried to process "+filepath+filename+" but was stopped by the blacklist")
         #locktime = datetime.fromtimestamp(lock_ts, pytz.utc)
         #logging.warning("Celery tried to process {0} but was stopped by the blacklist from {1}".format(filepath+filename, locktime))
 
