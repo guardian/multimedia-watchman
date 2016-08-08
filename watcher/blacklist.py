@@ -19,6 +19,11 @@ class WatchmanBlacklist(object):
             password = ""
 
         try:
+            redishost = config_xml.find('/global/redis').text
+        except StandardError as e:
+            redishost = "localhost"
+
+        try:
             expire = config_xml.find('/global/expire').text
             self.expire = int(expire)
         except StandardError as e:
@@ -32,7 +37,7 @@ class WatchmanBlacklist(object):
             logging.warning("No blacklistdb setting in the <global> section of config. Defaulting to Redis database 2.")
             dbnum = 2
 
-        self._conn = StrictRedis(password=password, db=dbnum)
+        self._conn = StrictRedis(host=redishost, password=password, db=dbnum)
         
     def get(self,filepath,update=True,value="(locked)"):
         """
