@@ -1,6 +1,8 @@
 import threading
 from time import sleep, time
 import logging
+from datetime import datetime
+import pytz
 
 __author__ = 'david_allison'
 
@@ -38,7 +40,10 @@ class WatchDogBasedSystem(threading.Thread):
         from watchdog.observers.polling import PollingObserver,PollingObserverVFS
         import os
         from tasks import action_file
-
+        from blacklist import WatchmanBlacklist
+        
+        blacklist = WatchmanBlacklist()
+        
         self.logger.info("Starting watchpuppy on {0}".format(self.path))
         observer = PollingObserverVFS(os.stat, os.listdir, polling_interval=0.8)
         event_handler = self.MyEventHandler(observer, list=self.wonderfullist, ignorelist=self.ignorelist)
@@ -53,7 +58,14 @@ class WatchDogBasedSystem(threading.Thread):
                     self.logger.debug("checking {0} with time {1}".format(path,ts))
                     if ts < (timeint2 - self.stable_time):
                         self.logger.info("{0} is More than {1} seconds old, so triggering".format(path, self.stable_time))
-                        action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
+                        cache_key = os.path.dirname(path)+os.path.basename(path)
+                        original_ts = blacklist.get(cache_key, update=True, value=timeint2)
+                        if original_ts is None:
+                            action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
+                        else:
+                            self.logger.warning("System tried to trigger on {0} but was stopped by the blacklist".format(path))
+                            #locktime = datetime.fromtimestamp(original_ts,pytz.utc)
+                            #self.logger.warning("System tried to trigger on {0} but was stopped by the blacklist from {1}".format(path,locktime))
 
                         del self.wonderfullist[path]
                 sleep(self.poll_delay)
