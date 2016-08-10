@@ -4,6 +4,8 @@ from celery_app import app
 from subprocess import CalledProcessError
 import logging
 from threading import Thread
+from datetime import datetime
+import pytz
 
 
 class DSNNotFound(Exception):
@@ -74,7 +76,6 @@ def run_command(cmd, concat=False):
     else:
         return (stdout_text, stderr_text)
 
-
 class LocationConfigNotFound(StandardError):
     pass
 
@@ -143,6 +144,7 @@ def action_file(filepath="", filename=""):
     from watcher.global_settings import CONFIG_FILE
     from logging import LoggerAdapter
     from global_settings import LOGFORMAT_RUNNER,LOGLEVEL
+    from blacklist import WatchmanBlacklist
     tree = ET.parse(CONFIG_FILE)
 
     try:
@@ -159,6 +161,17 @@ def action_file(filepath="", filename=""):
             use_suid_cds = True
     except AttributeError:# if it's not specified, assume we're not using it.
         pass
+
+    blacklist = WatchmanBlacklist(config_xml=tree)
+
+    lock_ts = blacklist.get("task_"+filepath+filename)
+
+    if lock_ts is not None:
+        logging.warning("Celery tried to process "+filepath+"/"+filename+" but was stopped by the blacklist")
+        #locktime = datetime.fromtimestamp(lock_ts, pytz.utc)
+        #logging.warning("Celery tried to process {0} but was stopped by the blacklist from {1}".format(filepath+filename, locktime))
+
+        return
 
     config = WatchedFolder(record=get_location_config(tree, filepath), raven_client=raven_client, suid_cds=use_suid_cds)
 

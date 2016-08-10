@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+WATCHMAN_VERSION = "1.3"
 from shutil import copy
 import os, errno
 from setuptools import setup, find_packages
