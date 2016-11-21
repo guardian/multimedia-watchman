@@ -8,7 +8,7 @@ class WatchedFolder(object):
     """
     Code that handles the reading of the XML based configuration file
     """
-    def __init__(self, record=None, location=None, debuglevel=None, polltime=None, stable_time=None, command=None,
+    def __init__(self, record=None, location=None, debuglevel=None, polltime=None, stable_time=None, commandlist=None,
                  raven_client=None, suid_cds=False):
         """
         Method which sets default values of various paramarters
@@ -17,7 +17,7 @@ class WatchedFolder(object):
         :param debuglevel: Debugging level
         :param polltime: Not used
         :param stable_time: Time in seconds to wait before processing the file
-        :param command: Linux command to execute
+        :param commandlist: List of Linux commands to execute
         :param raven_client: Raven client information
         :return:
         """
@@ -25,7 +25,7 @@ class WatchedFolder(object):
         self.debuglevel=debuglevel
         self.polltime=polltime
         self.stable_time=stable_time
-        self.command=command
+        self.commandlist=commandlist
         self.description=""
         self.kennel = None
         self.ignorelist = []
@@ -36,7 +36,7 @@ class WatchedFolder(object):
             self.debuglevel=self._safe_get(record, 'debuglevel')
             self.polltime=self._safe_get(record, "poll-time")
             self.description=self._safe_get(record, "desc")
-            self.command=self._safe_get(record, "command")
+            self.commandlist=self._safe_get_list(record, "command")
             self.ignorelist=self._safe_get(record,"ignore").split('|')
             self.check_cds(record)
 
@@ -81,35 +81,37 @@ class WatchedFolder(object):
         logger.info("Set up {0}".format(unicode(self)))
 
     def check_cds(self, record):
-        cds_node = record.find('cds')
-        if cds_node is None:
-            return
+        for cds_node in record.findall('cds'):
+            if cds_node is None:
+                return
 
-        cds_cmd = {}
+            cds_cmd = {}
 
-        for child_node in cds_node:
-            cds_cmd[child_node.tag] = child_node.text
+            for child_node in cds_node:
+                cds_cmd[child_node.tag] = child_node.text
 
-        logger.debug("CDS command parameters: {0}".format(cds_cmd))
-        args = []
-        for k,v in cds_cmd.items():
-            args.append("--{0} {1}".format(k,v))
+            logger.debug("CDS command parameters: {0}".format(cds_cmd))
+            args = []
+            for k,v in cds_cmd.items():
+                args.append("--{0} {1}".format(k,v))
 
-        if self.suid_cds:
-            cds_cmd = "/usr/local/bin/suid_cds"
-        else:
-            cds_cmd = "/usr/local/bin/cds_run.pl"
+            if self.suid_cds:
+                cds_cmd = "/usr/local/bin/suid_cds"
+            else:
+                cds_cmd = "/usr/local/bin/cds_run.pl"
 
-        self.command = "{cmd} {args}".format(cmd=cds_cmd, args=" ".join(args))
+            if self.commandlist is None:
+                self.commandlist = []
+            self.commandlist.append("{cmd} {args}".format(cmd=cds_cmd, args=" ".join(args)))
 
-        logger.debug("CDS command is {0}".format(self.command))
+            logger.debug("CDS commands are {0}".format(self.commandlist))
 
     def __unicode__(self):
         """
         Used in print a message showing the running tasks and what they are monitoring
         :return: A string with the above information in
         """
-        return u'Watched folder at {0} running \'{1}\': {2}'.format(self.location,self.command,self.description)
+        return u'Watched folder at {0} running \'{1}\': {2}'.format(self.location,self.commandlist,self.description)
 
     def _safe_get(self, record, xpath, default="(not found)"):
         """
@@ -123,9 +125,24 @@ class WatchedFolder(object):
         except AttributeError:
             return default
 
+    def _safe_get_list(self, record, xpath, default=None):
+        """
+        Method for safely loading XML without errors causing the system to stop
+        :param record: Various data
+        :param xpath: Xpath data
+        :param default: Set to (not found)
+        """
+        rtn = []
+        for node in record.findall(xpath):
+            try:
+                rtn.append(node.text)
+            except AttributeError:
+                if default is not None: rtn.append(default)
+        return rtn
+
     def verify(self):
-        if self.command is None:
-            raise ValueError("Invalid watchfolder: command is not set")
+        if self.commandlist is None or len(self.commandlist)==0:
+            raise ValueError("Invalid watchfolder: no commands are set")
         if self.location is None:
             raise ValueError("Invalid watchfolder: location is not set")
         if self.polltime is None:

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 BUILD_DIR=${HOME}/rpmbuild
-VERSION='1.1'
+VERSION=`grep WATCHMAN_VERSION setup.py | cut -d '"' -f2`   #extract version number from WATCHMAN_VERSION in setup.py
 
 RPMBUILD=`which rpmbuild`
 if [ "$?" == "1" ]; then

@@ -23,8 +23,18 @@
 			{pathname} just the path of the file
 			{filename} just the filename of the file with no directory
 		-->
-		<command>mv {filepath} /vagrant/complete;sleep 2s</command>
+		<command>mv {filepath} /vagrant/complete;</command>
+		<command>sleep 2s</command>
 	</path>	
 
-
+	<path location="/home/watchfolders/cds_test">
+		<debuglevel>5</debuglevel>
+		<desc>Test CDS watchfolder</desc>
+		<poll-time>5</poll-time>
+		<stable-time>8</stable-time>
+		<cds>
+			<route>testroute.xml</route>
+			<input-inmeta>{filepath}</input-inmeta>
+		</cds>
+	</path>
 </ffqueue>
