@@ -34,6 +34,6 @@ mkdir -p /etc/supervisor/conf.d
 
 increment_release Watchman.spec
 
-rpmbuild -bb Watchman.spec
+PATH=/bin:/usr/bin:/usr/local/bin rpmbuild -bb Watchman.spec
 
 mv ${BUILD_DIR}/RPMS/noarch/*.rpm .
