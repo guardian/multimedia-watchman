@@ -14,7 +14,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
 BuildArch: noarch
 Vendor: Andy Gallagher and David Allison <multimediatech@theguardian.com>
-Requires: python-devel, python-setuptools
+Requires: python-devel, python2-pip
 
 %description
 UNKNOWN
@@ -26,7 +26,7 @@ UNKNOWN
 python setup.py build
 
 %install
-python setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
+python setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --install-scripts=usr/bin --install-purelib=usr/lib64/python2.7/site-packages --record=INSTALLED_FILES
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -38,4 +38,3 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p /var/log/supervisor
 mkdir -p /var/log/watchman
 useradd celery
-easy_install supervisor celery certifi raven redis watchdog
