@@ -1,0 +1,16 @@
+machine:
+  timezone: Europe/London
+  python:
+    version: 2.7.12
+
+dependencies:
+  pre:
+    - apt-get install rpm build-essential awscli
+
+deployment:
+  master:
+    branch: /.*/
+    commands:
+      - chmod a+x buildrpm.sh
+      - ./buildrpm.sh
+      - for x in `ls *.rpm`;  do aws s3 cp $x s3://${RPM_STORAGE_BUCKET}/watchman/${CIRCLE_BUILD_NUM}
