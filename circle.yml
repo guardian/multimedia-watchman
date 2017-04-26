@@ -5,7 +5,7 @@ machine:
 
 dependencies:
   pre:
-    - apt-get install rpm build-essential awscli
+    - sudo apt-get install rpm build-essential awscli
 
 deployment:
   master:

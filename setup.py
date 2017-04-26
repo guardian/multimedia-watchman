@@ -20,7 +20,7 @@ setup(name='Watchman',
       author_email='multimediatech@theguardian.com',
       packages=['watcher'],
       scripts=['watcher/watchman'],
-      install_requires=['celery', 'certifi', 'raven', 'redis', 'watchdog'],
+      install_requires=['celery', 'certifi', 'raven', 'redis', 'watchdog', 'beatcop'],
       # data_files=[
       #   ('/etc', ['watcher_config/supervisord.conf']),
       #   ('/etc/init.d', ['watcher_config/initscript/supervisor']),
