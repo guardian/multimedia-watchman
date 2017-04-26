@@ -3,6 +3,8 @@
 %define unmangled_version 1.4
 %define release 1
 
+#disable automatic requirements scanning, as this introduces a dependency on the python path of circleci's virtualenv
+AutoReqProv: no
 Summary: A system which watches folders and executes commands when files are created in the folders
 Name: %{name}
 Version: %{version}
