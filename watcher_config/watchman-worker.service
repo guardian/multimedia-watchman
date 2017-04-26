@@ -1,9 +1,11 @@
 [Unit]
 Description=The Watchman service that runs jobs in response to things noticed by the watcher
 After=network.target
+
+[Install]
 WantedBy=watchman.target
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/celery -A watcher.celery_app worker -l info
-Restart=True
+Restart=always

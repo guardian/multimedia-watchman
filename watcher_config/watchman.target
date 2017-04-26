@@ -1,0 +1,8 @@
+[Unit]
+Description=Watchman folder watcher target
+Requires=network.target
+Wants=watchman-watcher.service watchman-worker.service
+Conflicts=rescue.service rescue.target
+
+[Install]
+WantedBy=multi-user.target

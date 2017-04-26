@@ -1,9 +1,11 @@
 [Unit]
 Description=The Watchman service that scans a mounted filesystem for changes
 After=network.target
+
+[Install]
 WantedBy=watchman.target
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/watchman
-Restart=True
+Restart=always
