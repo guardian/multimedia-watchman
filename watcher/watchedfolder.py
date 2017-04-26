@@ -106,6 +106,9 @@ class WatchedFolder(object):
 
             logger.debug("CDS commands are {0}".format(self.commandlist))
 
+    def __str__(self):
+        return str(self.__unicode__())
+
     def __unicode__(self):
         """
         Used in print a message showing the running tasks and what they are monitoring
