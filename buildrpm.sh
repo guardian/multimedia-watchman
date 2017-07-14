@@ -36,4 +36,10 @@ increment_release Watchman.spec
 
 PATH=/bin:/usr/bin:/usr/local/bin rpmbuild -bb Watchman.spec
 
-mv ${BUILD_DIR}/RPMS/noarch/*.rpm .
+for rpmfile in `${BUILD_DIR}/RPMS/noarch/*.rpm`; do
+    HASH=$(sha1sum ${rpmfile} | cut -d ' ' -f 1)
+    echo -e "sha1=$HASH" > ${rpmfile}.sha
+    mv ${rpmfile} .
+    mv ${rpmfile}.sha .
+done
+

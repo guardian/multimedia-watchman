@@ -76,6 +76,7 @@ def run_command(cmd, concat=False):
     else:
         return (stdout_text, stderr_text)
 
+
 class LocationConfigNotFound(StandardError):
     pass
 

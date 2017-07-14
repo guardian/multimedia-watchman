@@ -14,3 +14,4 @@ deployment:
       - chmod a+x buildrpm.sh
       - ./buildrpm.sh
       - for x in `ls *.rpm`;  do aws s3 cp $x s3://${RPM_STORAGE_BUCKET}/watchman/${CIRCLE_BUILD_NUM}/`basename $x`; done
+      - for x in `ls *.rpm.sha`;  do aws s3 cp $x s3://${RPM_STORAGE_BUCKET}/watchman/${CIRCLE_BUILD_NUM}/`basename $x`; done
