@@ -55,6 +55,7 @@ class WatchmanBlacklist(object):
         #    self._conn.expire(filepath, self.expire)
 
         if not self._conn.exists(filepath):
+            logging.debug("{0} does not exist in the blacklist. Attempting to add it.".format(filepath))
             self._conn.setnx(filepath, value)
             self._conn.expire(filepath, self.expire)
         
