@@ -164,6 +164,7 @@ def action_file(filepath="", filename=""):
 
     blacklist = WatchmanBlacklist(config_xml=tree)
 
+    logging.debug("Checking the blacklist for task_{0}{1}".format(filepath, filename))
     lock_ts = blacklist.get("task_"+filepath+filename)
 
     if lock_ts is not None:

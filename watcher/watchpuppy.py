@@ -61,10 +61,13 @@ class WatchDogBasedSystem(threading.Thread):
                         cache_key = os.path.dirname(path)+os.path.basename(path)
                         original_ts = blacklist.get(cache_key, update=True, value=timeint2)
                         if original_ts is None:
+                            self.logger.debug("No time stamp found for {0}".format(cache_key))
                             action_file.delay(filepath=os.path.dirname(path), filename=os.path.basename(path))
                         else:
                             self.logger.warning("System tried to trigger on {0} but was stopped by the blacklist".format(path))
+                        self.logger.debug("Attempting to delete {0} from the list".format(path))
                         del self.wonderfullist[path]
+                self.logger.debug("Pausing for {0} seconds".format(self.poll_delay))
                 sleep(self.poll_delay)
         except KeyboardInterrupt:
             observer.stop()
