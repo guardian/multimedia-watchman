@@ -9,6 +9,7 @@
 		<result-backend>**result backend url here**</result-backend>
 		<!-- If you want to get exceptions reported to Sentry, put a DSN in here -->
 		<!--<raven-dsn></raven-dsn>-->
+		<log-level>INFO</log-level>
 	</global>
 
 	<!--add watchfolder definitions here-->

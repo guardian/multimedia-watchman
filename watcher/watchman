@@ -30,6 +30,18 @@ folders = {}
 tree = ET.parse(CONFIG_FILE)
 root = tree.getroot()
 
+
+def set_log_level(level):
+    level_to_set = logging.getLevelName(level)
+    logging.getLogger().setLevel(level_to_set)
+
+
+try:
+    log_level = tree.find('/global/log-level').text
+    set_log_level(log_level)
+except Exception:
+    pass
+
 try:
     raven_client = RavenClient(get_dsn(tree), raise_exception=True)
 except DSNNotFound:
