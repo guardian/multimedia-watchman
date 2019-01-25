@@ -33,8 +33,8 @@ class WatchDogBasedSystem(threading.Thread):
         self.loglevel = loglevel
 
     def set_log_level(self, level):
-        level_to_set = self.logging.getLevelName(level)
-        self.logging.getLogger().setLevel(level_to_set)
+        level_to_set = logging.getLevelName(level)
+        logging.getLogger().setLevel(level_to_set)
 
     def run(self):
         """
@@ -48,7 +48,7 @@ class WatchDogBasedSystem(threading.Thread):
         from blacklist import WatchmanBlacklist
 
         try:
-            self.set_log_level(self, self.loglevel)
+            self.set_log_level(self.loglevel)
         except Exception:
             pass
         
