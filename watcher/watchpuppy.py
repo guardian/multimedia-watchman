@@ -67,7 +67,6 @@ class WatchDogBasedSystem(threading.Thread):
                             self.logger.warning("System tried to trigger on {0} but was stopped by the blacklist".format(path))
                         self.logger.debug("Attempting to delete {0} from the list".format(path))
                         del self.wonderfullist[path]
-                self.logger.debug("Pausing for {0} seconds".format(self.poll_delay))
                 sleep(self.poll_delay)
         except KeyboardInterrupt:
             observer.stop()
