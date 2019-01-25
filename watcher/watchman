@@ -53,7 +53,7 @@ for record in tree.findall("path"):
     folders[f.location] = f
     logging.info("Setting up watched folder at {0}, stable time is {1}.".format(f.location,f.stable_time))
     logging.debug("Watched folder {0} has ignorelist {1}".format(f.location,f.ignorelist))
-    s = WatchDogBasedSystem(location=f.location, poll_delay=f.polltime, stable_time=f.stable_time, ignorelist=f.ignorelist)
+    s = WatchDogBasedSystem(location=f.location, poll_delay=f.polltime, stable_time=f.stable_time, ignorelist=f.ignorelist, loglevel=f.loglevel)
     s.daemon = True
     folders[f.location].kennel = s
     s.start()

@@ -13,7 +13,7 @@ class WatchDogBasedSystem(threading.Thread):
     """
     from watchdog.events import FileSystemEventHandler
 
-    def __init__(self, location=None, poll_delay=1, stable_time=10, recursive=False, ignorelist=[], *args, **kwargs):
+    def __init__(self, location=None, poll_delay=1, stable_time=10, recursive=False, ignorelist=[], loglevel=None, *args, **kwargs):
         """
         Initialise the system
         :param location: (string) Path to the directory to watch
@@ -30,6 +30,11 @@ class WatchDogBasedSystem(threading.Thread):
         self.stable_time = stable_time
         self.recursive = recursive
         self.ignorelist = ignorelist
+        self.loglevel = loglevel
+
+    def set_log_level(self, level):
+        level_to_set = self.logging.getLevelName(level)
+        self.logging.getLogger().setLevel(level_to_set)
 
     def run(self):
         """
@@ -41,6 +46,11 @@ class WatchDogBasedSystem(threading.Thread):
         import os
         from tasks import action_file
         from blacklist import WatchmanBlacklist
+
+        try:
+            self.set_log_level(self, self.loglevel)
+        except Exception:
+            pass
         
         blacklist = WatchmanBlacklist()
         
