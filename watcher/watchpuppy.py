@@ -23,7 +23,7 @@ class WatchDogBasedSystem(threading.Thread):
         :param kwargs: (other arguments for threading.Thread)
         """
         super(WatchDogBasedSystem, self).__init__(*args,**kwargs)
-        self.logger = logging.getLogger('WatchDogBasedSystem')
+        self.logger = logging.getLogger('WatchDogBasedSystem.{0}'.format(location))
         self.path=location
         self.wonderfullist = {}
         self.poll_delay = poll_delay
@@ -34,7 +34,7 @@ class WatchDogBasedSystem(threading.Thread):
 
     def set_log_level(self, level):
         level_to_set = logging.getLevelName(level)
-        logging.getLogger().setLevel(level_to_set)
+        self.logger.setLevel(level_to_set)
 
     def run(self):
         """
