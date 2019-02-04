@@ -12,6 +12,8 @@ class WatchmanBlacklist(object):
         try:
             self.set_log_level(loglevel)
         except Exception:
+            if loglevel is not None:
+                logging.warning("Attempt at setting log level {0} failed.".format(loglevel))
             pass
         if config_xml is None:
             config_xml = ET.parse(CONFIG_FILE)
