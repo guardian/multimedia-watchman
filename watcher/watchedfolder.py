@@ -9,7 +9,7 @@ class WatchedFolder(object):
     Code that handles the reading of the XML based configuration file
     """
     def __init__(self, record=None, location=None, debuglevel=None, polltime=None, stable_time=None, commandlist=None,
-                 raven_client=None, suid_cds=False):
+                 raven_client=None, suid_cds=False, loglevel=None):
         """
         Method which sets default values of various paramarters
         :param record: Misc. data
@@ -24,6 +24,7 @@ class WatchedFolder(object):
         self.location=location
         self.debuglevel=debuglevel
         self.polltime=polltime
+        self.loglevel=loglevel
         self.stable_time=stable_time
         self.commandlist=commandlist
         self.description=""
@@ -35,6 +36,7 @@ class WatchedFolder(object):
             self.location=record.attrib['location']
             self.debuglevel=self._safe_get(record, 'debuglevel')
             self.polltime=self._safe_get(record, "poll-time")
+            self.loglevel=self._safe_get(record, "log-level")
             self.description=self._safe_get(record, "desc")
             self.commandlist=self._safe_get_list(record, "command")
             self.ignorelist=self._safe_get(record,"ignore").split('|')

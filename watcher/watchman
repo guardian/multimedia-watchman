@@ -30,6 +30,18 @@ folders = {}
 tree = ET.parse(CONFIG_FILE)
 root = tree.getroot()
 
+
+def set_log_level(level):
+    level_to_set = logging.getLevelName(level)
+    logging.getLogger().setLevel(level_to_set)
+
+
+try:
+    log_level = tree.find('/global/log-level').text
+    set_log_level(log_level)
+except Exception:
+    pass
+
 try:
     raven_client = RavenClient(get_dsn(tree), raise_exception=True)
 except DSNNotFound:
@@ -41,7 +53,7 @@ for record in tree.findall("path"):
     folders[f.location] = f
     logging.info("Setting up watched folder at {0}, stable time is {1}.".format(f.location,f.stable_time))
     logging.debug("Watched folder {0} has ignorelist {1}".format(f.location,f.ignorelist))
-    s = WatchDogBasedSystem(location=f.location, poll_delay=f.polltime, stable_time=f.stable_time, ignorelist=f.ignorelist)
+    s = WatchDogBasedSystem(location=f.location, poll_delay=f.polltime, stable_time=f.stable_time, ignorelist=f.ignorelist, loglevel=f.loglevel)
     s.daemon = True
     folders[f.location].kennel = s
     s.start()
