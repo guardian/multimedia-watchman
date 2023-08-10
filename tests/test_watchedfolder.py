@@ -13,7 +13,7 @@ class TestWatchedFolder(unittest2.TestCase):
         from watcher.watchedfolder import WatchedFolder
 
         data = ET.parse(self.TEST_CONF_FILE)
-        records = map(lambda record: WatchedFolder(record=record), data.findall("path"))
+        records = list(map(lambda record: WatchedFolder(record=record), data.findall("path")))
 
         self.assertEqual(len(records),2)
         self.assertEqual(records[0].debuglevel,"5")

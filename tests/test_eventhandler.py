@@ -1,7 +1,7 @@
-from __future__ import absolute_import
+from collections.abc import Mapping as DictMixin
 import unittest2
-from mock import MagicMock,patch
-from os.path import abspath,basename,dirname
+from unittest.mock import MagicMock, patch
+from os.path import abspath, basename, dirname
 from pprint import pprint
 import logging
 
