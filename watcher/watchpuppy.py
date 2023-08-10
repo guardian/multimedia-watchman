@@ -99,7 +99,7 @@ class WatchDogBasedSystem(threading.Thread):
             import os
             file_name, file_extension = os.path.splitext(event.src_path)
             #print "e=", event
-            logging.debug("{0} event seen: {1}".format(type,unicode(event)))
+            logging.debug("{0} event seen: {1}".format(type, event))
             if file_extension in self.ignorelist:
                 logging.debug("ignoring event as {0} is set to ignore".format(file_extension))
                 return

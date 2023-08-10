@@ -80,7 +80,7 @@ class WatchedFolder(object):
                     raven_client.captureException()
                 logging.error(traceback.format_exc())
                 self.stable_time = 3
-        logger.info("Set up {0}".format(unicode(self)))
+        logger.info("Set up {0}".format(self))
 
     def check_cds(self, record):
         for cds_node in record.findall('cds'):
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     import xml.etree.cElementTree as ET
     from sys import argv
     from pprint import pprint
-    print "Running tests on watchedfolder module"
+    print("Running tests on watchedfolder module")
 
     logging.basicConfig(level=logging.DEBUG)
     data = ET.parse(argv[1])
